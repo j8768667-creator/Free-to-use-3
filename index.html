@@ -95,7 +95,7 @@ button{border:0;border-radius:10px;padding:10px 16px;font-weight:700;cursor:poin
 </div>
 
 <div class="actions">
-<button class="primary" id="generateBtn">⚡ Generate Patterns</button>
+<button class="primary" id="generateBtn" title="Creates a new pattern from the selected genre and seed">⚡ Generate Patterns</button>
 <button class="secondary" id="previewBtn">▶ Preview</button>
 <button class="secondary" id="exportBtn">💾 Export MIDI</button>
 <button class="secondary" id="exportStemsBtn">📦 Export Stems</button>
@@ -143,6 +143,7 @@ button{border:0;border-radius:10px;padding:10px 16px;font-weight:700;cursor:poin
 const PPQ=480, BAR=PPQ*4, STEP=PPQ/4;
 const PC={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
 const NOTE_NAMES=["C","C♯","D","E♭","E","F","F♯","G","A♭","A","B♭","B"];
+let appState={arrangement:null,dirty:false};
 const QUAL={"":[0,4,7],m:[0,3,7],"6":[0,4,7,9],m6:[0,3,7,9],"7":[0,4,7,10],m7:[0,3,7,10],maj7:[0,4,7,11],"9":[0,4,7,10,14],m9:[0,3,7,10,14],maj9:[0,4,7,11,14],sus2:[0,2,7],sus4:[0,5,7],dim:[0,3,6],dim7:[0,3,6,9],aug:[0,4,8],m7b5:[0,3,6,10]};
 
 const $=id=>document.getElementById(id), clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
@@ -202,25 +203,44 @@ function selectedKey(chords){
 
 // Pattern grid generation
 function generateDrumPattern(song,barChords){
-  const steps=16;
-  const pattern=[];
-  const rng=rng32(song.seed);
+  const steps=16, pattern=[], rng=rng32(song.seed);
   const density=+$("drumDensity").value/3;
-  
+
+  const chance=p=>rng()<p*density;
   for(let b=0;b<song.bars;b++){
     const barPattern=[];
     for(let s=0;s<steps;s++){
+      const beat=s/4, sub=s%4;
       let hit=false;
-      // Kick on 1, 2.5, 3.5 in rock; 1 and 3 in pop; etc.
-      const beat=s/4;
-      if(song.genre==="rock"){
-        if(beat===0 || beat===2 || (beat===1.5 && rng()<0.3*density) || (beat===3 && rng()<0.4*density)) hit=true;
-      }else if(song.genre==="house"){
-        if(beat%1===0 || (beat%1===0.5 && rng()<0.3*density)) hit=true;
-      }else if(song.genre==="jazz"){
-        if(beat===0 || beat===2 || (rng()<0.2*density)) hit=true;
-      }else{
-        if(beat===0 || beat===2 || (beat===1 && rng()<0.3*density) || (beat===3 && rng()<0.4*density)) hit=true;
+      switch(song.genre){
+        case "rock":
+          hit = s===0 || s===8 || s===4 || s===12 ||
+                (sub===2 && chance(.45)) || (s===14 && chance(.55));
+          break;
+        case "pop":
+          hit = s===0 || s===8 || s===4 || s===12 ||
+                (s===6 && chance(.35)) || (s===14 && chance(.45));
+          break;
+        case "house":
+          hit = sub===0 || (sub===2 && chance(.75)) || (s===14 && chance(.35));
+          break;
+        case "funk":
+          hit = s===0 || s===4 || s===10 || s===12 ||
+                ([3,6,7,14,15].includes(s) && chance(.7));
+          break;
+        case "reggae":
+          hit = s===2 || s===6 || s===10 || s===14 ||
+                (s===12 && chance(.45));
+          break;
+        case "jazz":
+          hit = s===0 || s===8 || [2,6,10,14].includes(s) ||
+                ([5,11,15].includes(s) && chance(.35));
+          break;
+        case "ambient":
+          hit = s===0 || (s===12 && chance(.2));
+          break;
+        default:
+          hit = s===0 || s===8 || (sub===2 && chance(.3));
       }
       barPattern.push(hit);
     }
@@ -251,10 +271,14 @@ function generateMelodyPattern(song,barChords){
       const beat=s/4;
       let pitch=null;
       const isStrong=beat%1===0;
-      const shouldPlay=isStrong?rng()<activity*0.9:rng()<activity*0.4;
+      let genreFactor={ambient:.35,jazz:.75,funk:.9,reggae:.55,house:.7,rock:.8,pop:.7}[song.genre]||.7;
+      const shouldPlay=isStrong?rng()<activity*genreFactor:rng()<activity*genreFactor*.45;
       
       if(shouldPlay){
-        const pc=pool[Math.floor(rng()*pool.length)];
+        let sourcePool=pool;
+        if(song.genre==="jazz" && rng()<.35) sourcePool=scale;
+        if(song.genre==="ambient" && rng()<.6) sourcePool=[chord.root,(chord.root+7)%12];
+        const pc=sourcePool[Math.floor(rng()*sourcePool.length)];
         let target=prevPitch+(rng()-0.5)*range*(2+leapiness*2);
         target=clamp(target,48,84);
         pitch=midiAt(pc,target);
@@ -414,34 +438,110 @@ function buildArrangement(){
   return{barChords,events,bars,genre,tempo,seed,key,drumPattern,melodyPattern,bassPattern,harmonyPattern};
 }
 
+
+function arrangementFromState(){
+  if(!appState.arrangement) return buildArrangement();
+  const arr=appState.arrangement;
+  const events=[];
+  const swing=+$("drumSwing").value;
+  const human=+$("drumHuman").value;
+  const rng=rng32(arr.seed+12345);
+
+  if($("enableDrums").checked){
+    for(let b=0;b<arr.drumPattern.length;b++){
+      const base=b*BAR;
+      for(let s=0;s<arr.drumPattern[b].length;s++){
+        if(!arr.drumPattern[b][s]) continue;
+        const tick=base+s*STEP;
+        const swung=swing?tick+(s%2===1?swing*PPQ/200:0):tick;
+        const offset=human?Math.round((rng()-.5)*human*.5):0;
+        let pitch=42;
+        if(s%4===0) pitch=36;
+        else if(s%4===2) pitch=38;
+        if(arr.genre==="house" && s%4===2) pitch=42;
+        if(arr.genre==="reggae" && s%4===2) pitch=37;
+        addNote(events,"drums",swung+offset,30,pitch,70+Math.round(rng()*30),9);
+      }
+    }
+  }
+
+  if($("enableBass").checked){
+    for(let b=0;b<arr.bassPattern.length;b++){
+      const base=b*BAR;
+      for(let s=0;s<arr.bassPattern[b].length;s++){
+        const pitch=arr.bassPattern[b][s];
+        if(typeof pitch!=="number") continue;
+        addNote(events,"bass",base+s*STEP,STEP-12,pitch,80+Math.round(rng()*20),1);
+      }
+    }
+  }
+
+  if($("enableHarmony").checked){
+    for(let b=0;b<arr.harmonyPattern.length;b++){
+      const base=b*BAR;
+      for(let s=0;s<arr.harmonyPattern[b].length;s++){
+        const notes=arr.harmonyPattern[b][s];
+        if(!Array.isArray(notes)) continue;
+        for(const n of notes) addNote(events,"harmony",base+s*STEP,STEP-8,n,70+Math.round(rng()*20),2);
+      }
+    }
+  }
+
+  if($("enableLead").checked){
+    for(let b=0;b<arr.melodyPattern.length;b++){
+      const base=b*BAR;
+      for(let s=0;s<arr.melodyPattern[b].length;s++){
+        const pitch=arr.melodyPattern[b][s];
+        if(typeof pitch!=="number") continue;
+        addNote(events,"lead",base+s*STEP,STEP-4,pitch,85+Math.round(rng()*25),3);
+      }
+    }
+  }
+
+  events.sort((a,b)=>a.tick-b.tick);
+  return {...arr,events};
+}
+
 // Render pattern grids
-function renderGrid(grid,container,isDrum=false){
+function renderGrid(grid,container,isDrum=false,type="drum"){
   container.innerHTML="";
   if(!grid||!grid.length){container.innerHTML='<span style="color:var(--muted);font-size:13px">No pattern loaded</span>';return}
-  
+
   for(let b=0;b<grid.length;b++){
     const row=document.createElement("div");
-    row.style.display="flex";
-    row.style.gap="2px";
-    row.style.margin="2px 0";
-    
+    row.style.display="flex"; row.style.gap="2px"; row.style.margin="2px 0";
     const label=document.createElement("div");
-    label.className="pattern-label";
-    label.textContent=b+1;
-    label.style.minWidth="16px";
+    label.className="pattern-label"; label.textContent=b+1; label.style.minWidth="16px";
     row.appendChild(label);
-    
+
     for(let s=0;s<grid[b].length;s++){
       const cell=document.createElement("div");
-      cell.className="pattern-cell"+(grid[b][s]?" active":"");
-      if(isDrum && grid[b][s])cell.classList.add("hit");
-      cell.dataset.bar=b;
-      cell.dataset.step=s;
+      const active=grid[b][s]!==null && grid[b][s]!==false;
+      cell.className="pattern-cell"+(active?" active":"");
+      if(isDrum&&active)cell.classList.add("hit");
+      cell.dataset.bar=b; cell.dataset.step=s;
+
       cell.addEventListener("click",()=>{
-        grid[b][s]=!grid[b][s];
-        cell.classList.toggle("active");
-        if(isDrum)cell.classList.toggle("hit");
-        updateStatus("Pattern edited.");
+        if(type==="drum"){
+          grid[b][s]=!grid[b][s];
+        }else if(type==="melody" || type==="bass"){
+          if(typeof grid[b][s]==="number") grid[b][s]=null;
+          else{
+            const chord=appState.arrangement.barChords[b];
+            grid[b][s]=midiAt(chord.root,type==="bass"?38:64);
+          }
+        }else if(type==="harmony"){
+          if(Array.isArray(grid[b][s])) grid[b][s]=null;
+          else{
+            const chord=appState.arrangement.barChords[b];
+            grid[b][s]=chord.ints.slice(0,3).map(i=>midiAt((chord.root+i)%12,58));
+          }
+        }
+        appState.dirty=true;
+        const nowActive=grid[b][s]!==null && grid[b][s]!==false;
+        cell.classList.toggle("active",nowActive);
+        if(isDrum)cell.classList.toggle("hit",nowActive);
+        updateStatus("Pattern edited. Preview and export will use your changes.");
       });
       row.appendChild(cell);
     }
@@ -509,7 +609,7 @@ function stopPreview(){if(audioCtx){const now=audioCtx.currentTime;activeNodes.f
 function playPreview(){
   stopPreview();
   try{
-    const arr=buildArrangement();
+    const arr=arrangementFromState();
     renderPatterns(arr);
     const ctx=ensureAudio(),master=ctx.createGain();master.gain.value=.25;master.connect(ctx.destination);
     const secTick=60/(arr.tempo*PPQ),start=ctx.currentTime+.1;
@@ -526,10 +626,10 @@ function playPreview(){
 }
 
 function renderPatterns(arr){
-  renderGrid(arr.drumPattern,$("drumGrid"),true);
-  renderGrid(arr.melodyPattern,$("melodyGrid"));
-  renderGrid(arr.bassPattern,$("bassGrid"));
-  renderGrid(arr.harmonyPattern,$("harmonyGrid"));
+  renderGrid(arr.drumPattern,$("drumGrid"),true,"drum");
+  renderGrid(arr.melodyPattern,$("melodyGrid"),false,"melody");
+  renderGrid(arr.bassPattern,$("bassGrid"),false,"bass");
+  renderGrid(arr.harmonyPattern,$("harmonyGrid"),false,"harmony");
   
   const lines=[`${arr.genre.toUpperCase()} · ${arr.tempo} BPM · ${arr.bars} bars · seed ${arr.seed}`,"","BAR  CHORD"];
   for(let b=0;b<Math.min(arr.bars,32);b++)lines.push(`${String(b+1).padStart(3,"0")}  ${arr.barChords[b].name}`);
@@ -543,15 +643,17 @@ function generate(){
   stopPreview();
   try{
     const arr=buildArrangement();
+    appState.arrangement=arr;
+    appState.dirty=false;
     renderPatterns(arr);
-    updateStatus("Patterns generated.");
+    updateStatus(`Patterns generated for ${arr.genre} with seed ${arr.seed}.`);
   }catch(e){updateStatus("Error: "+e.message,true)}
 }
 
 function download(){
   stopPreview();
   try{
-    const arr=buildArrangement();
+    const arr=arrangementFromState();
     const bytes=midiBytes(arr);
     const blob=new Blob([bytes],{type:"audio/midi"});
     const a=document.createElement("a"),url=URL.createObjectURL(blob);
@@ -565,7 +667,7 @@ function download(){
 function exportStems(){
   stopPreview();
   try{
-    const arr=buildArrangement();
+    const arr=arrangementFromState();
     const tracks=["drums","bass","harmony","lead"];
     const active=tracks.filter(t=>$(t.replace("enable","enable").toLowerCase()+"Check")||$(t==="drums"?"enableDrums":t==="bass"?"enableBass":t==="harmony"?"enableHarmony":"enableLead").checked);
     if(!active.length){updateStatus("Enable at least one track.",true);return}
@@ -619,21 +721,21 @@ $("exportStemsBtn").onclick=exportStems;
 $("randomSeedBtn").onclick=()=>{$("seedInput").value=Math.floor(Math.random()*1000000);generate()};
 
 $("clearDrumsBtn").onclick=()=>{
-  const grid=$("drumGrid");
-  const cells=grid.querySelectorAll(".pattern-cell");
-  cells.forEach(c=>{c.classList.remove("active","hit");});
-  updateStatus("Drums cleared.");
+  if(!appState.arrangement) generate();
+  appState.arrangement.drumPattern.forEach(row=>row.fill(false));
+  appState.dirty=true;
+  renderPatterns(appState.arrangement);
+  updateStatus("Drums cleared. Preview and export will use the cleared pattern.");
 };
 
 $("fillDrumsBtn").onclick=()=>{
-  const grid=$("drumGrid");
-  const cells=grid.querySelectorAll(".pattern-cell");
-  cells.forEach((c,i)=>{
-    const hit=i%3===0||i%7===0;
-    c.classList.toggle("active",hit);
-    c.classList.toggle("hit",hit);
+  if(!appState.arrangement) generate();
+  appState.arrangement.drumPattern.forEach((row,b)=>{
+    for(let s=0;s<row.length;s++) row[s]=(s%4===0)||(s===6)||(s===14);
   });
-  updateStatus("Drums filled.");
+  appState.dirty=true;
+  renderPatterns(appState.arrangement);
+  updateStatus("Drums filled. Preview and export will use the filled pattern.");
 };
 
 // Theme toggle
