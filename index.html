@@ -179,35 +179,38 @@
   <div class="container">
     <header>
       <h1>Markov Chain Melody Companion</h1>
-      <p>Probabilistic Algorithmic Sequence Generator</p>
+      <p>Multi-File Probabilistic Sequence Synthesizer</p>
     </header>
 
     <div class="card">
       <h3>1. Training Input Source</h3>
       <div class="grid">
         <div class="form-group">
-          <label for="midi-file">Upload MIDI File (.mid)</label>
-          <input type="file" id="midi-file" accept=".mid,.midi">
+          <label for="midi-file">Upload MIDI Files (Select Multiple)</label>
+          <input type="file" id="midi-file" accept=".mid,.midi" multiple>
         </div>
         <div class="form-group">
-          <label for="preset-select">Or Load Built-In Style Preset</label>
+          <label for="preset-select">Or Load Built-In Style Presets</label>
           <select id="preset-select" onchange="loadPreset()">
             <option value="baroque">Baroque Bach Counterpoint</option>
             <option value="jazz">Jazz Blues Scale Riff</option>
             <option value="pentatonic">Asian Pentatonic Folk</option>
+            <option value="chopin">Romantic Chopin Nocturne</option>
+            <option value="synthwave">Synthwave Arpeggios</option>
+            <option value="ambient">Lydian Ambient Float</option>
           </select>
         </div>
       </div>
-      <div id="dataset-status" class="status-badge">Dataset Loaded: 24 Notes Analyzed</div>
+      <div id="dataset-status" class="status-badge">Dataset Loaded: 23 Notes Analyzed (1 File)</div>
     </div>
 
     <div class="card">
-      <h3>2. Engine Controls</h3>
+      <h3>2. Engine Controls & Sequence Length</h3>
       <div class="grid">
         <div class="form-group">
           <label for="order-select">Markov Order (N-Gram)</label>
           <select id="order-select" onchange="buildMatrix()">
-            <option value="1">Order 1 (Higher Variation / Randomness)</option>
+            <option value="1">Order 1 (High Variation / Randomness)</option>
             <option value="2" selected>Order 2 (Balanced Motif Structure)</option>
             <option value="3">Order 3 (Strict Style Cloning)</option>
           </select>
@@ -216,6 +219,17 @@
         <div class="form-group">
           <label for="tempo-input">Tempo (BPM)</label>
           <input type="number" id="tempo-input" value="130" min="60" max="220">
+        </div>
+
+        <div class="form-group">
+          <label for="length-select">Generation Duration / Note Count</label>
+          <select id="length-select">
+            <option value="16">16 Notes (4 Bars @ 4/4)</option>
+            <option value="32" selected>32 Notes (8 Bars @ 4/4)</option>
+            <option value="64">64 Notes (16 Bars @ 4/4)</option>
+            <option value="128">128 Notes (32 Bars @ 4/4)</option>
+            <option value="infinite">Infinite Loop Playback</option>
+          </select>
         </div>
       </div>
     </div>
@@ -226,23 +240,26 @@
       <div class="visualizer-box" id="current-note">--</div>
 
       <div class="btn-group">
-        <button class="btn" id="play-btn" style="flex: 2;" onclick="togglePlayback()">▶ Play Infinite Stream</button>
-        <button class="btn btn-secondary" style="flex: 1;" onclick="exportMidi()">Export Generated Track (.mid)</button>
+        <button class="btn" id="play-btn" style="flex: 2;" onclick="togglePlayback()">▶ Play Stream</button>
+        <button class="btn btn-secondary" style="flex: 1;" onclick="exportMidi()">Export Sequence (.mid)</button>
       </div>
 
       <div class="form-group">
         <label>Markov Transition Matrix Log</label>
-        <div class="log-box" id="log-box">Engine initialized. Ready to generate...</div>
+        <div class="log-box" id="log-box">Engine initialized. Multi-file support active.</div>
       </div>
     </div>
   </div>
 
   <script>
-    // Built-in Training Datasets (MIDI Note Numbers)
+    // Expanded Built-in Style Datasets
     const PRESETS = {
       baroque: [60, 62, 64, 65, 67, 65, 64, 62, 60, 67, 69, 71, 72, 71, 69, 67, 65, 64, 62, 60, 64, 67, 72],
       jazz: [60, 63, 65, 66, 67, 70, 72, 70, 67, 66, 65, 63, 60, 58, 60, 63, 65, 67, 70, 72],
-      pentatonic: [60, 62, 65, 67, 69, 72, 69, 67, 65, 62, 60, 65, 67, 72, 69, 65, 62, 60]
+      pentatonic: [60, 62, 65, 67, 69, 72, 69, 67, 65, 62, 60, 65, 67, 72, 69, 65, 62, 60],
+      chopin: [60, 63, 67, 70, 72, 75, 74, 72, 70, 67, 63, 60, 58, 62, 65, 68, 70, 74, 72, 70, 67],
+      synthwave: [48, 60, 48, 63, 48, 65, 48, 67, 48, 65, 48, 63, 48, 60, 48, 58],
+      ambient: [60, 62, 66, 67, 71, 72, 71, 67, 66, 62, 60, 64, 66, 71, 74, 72, 67, 66]
     };
 
     let dataset = [...PRESETS.baroque];
@@ -252,6 +269,7 @@
     let timerId = null;
     let currentHistory = [];
     let generatedHistory = [];
+    let currentNoteCount = 0;
 
     const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
@@ -268,11 +286,11 @@
     function loadPreset() {
       const val = document.getElementById('preset-select').value;
       dataset = [...PRESETS[val]];
-      document.getElementById('dataset-status').textContent = `Dataset Loaded: ${dataset.length} Notes Analyzed`;
+      document.getElementById('dataset-status').textContent = `Dataset Loaded: ${dataset.length} Notes (1 Preset File)`;
+      document.getElementById('dataset-status').classList.remove('active');
       buildMatrix();
     }
 
-    // Build N-Order Markov Transition Matrix
     function buildMatrix() {
       const order = parseInt(document.getElementById('order-select').value);
       transitionMatrix = {};
@@ -287,7 +305,7 @@
         transitionMatrix[stateKey].push(nextNote);
       }
 
-      logMessage(`Matrix built. Order: ${order}, Total States: ${Object.keys(transitionMatrix).length}`);
+      logMessage(`Matrix rebuilt. Order: ${order}, States: ${Object.keys(transitionMatrix).length}, Total Dataset Notes: ${dataset.length}`);
     }
 
     function logMessage(msg) {
@@ -296,7 +314,6 @@
       logBox.scrollTop = logBox.scrollHeight;
     }
 
-    // Predict Next Note using Weighted Markov Sampling
     function getNextNote() {
       const order = parseInt(document.getElementById('order-select').value);
       
@@ -307,7 +324,6 @@
       const stateKey = currentHistory.slice(-order).join(',');
       let options = transitionMatrix[stateKey];
 
-      // Fallback if sequence hits a state with no known transitions
       if (!options || options.length === 0) {
         const randIndex = Math.floor(Math.random() * dataset.length);
         const fallbackNote = dataset[randIndex];
@@ -320,7 +336,6 @@
       return chosenNote;
     }
 
-    // Synthesize Live Synth Sound
     function playSynthNote(midiNote, duration) {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -345,65 +360,89 @@
     function step() {
       if (!isPlaying) return;
 
+      const targetLengthVal = document.getElementById('length-select').value;
       const bpm = parseInt(document.getElementById('tempo-input').value) || 120;
       const duration = 60 / bpm;
 
+      if (targetLengthVal !== 'infinite') {
+        const maxNotes = parseInt(targetLengthVal);
+        if (currentNoteCount >= maxNotes) {
+          stopPlayback();
+          logMessage(`Completed sequence duration of ${maxNotes} notes.`);
+          return;
+        }
+      }
+
       const nextNote = getNextNote();
       generatedHistory.push(nextNote);
+      currentNoteCount++;
 
-      // Render Note Display
-      const noteName = midiToName(nextNote);
-      document.getElementById('current-note').textContent = noteName;
-
+      document.getElementById('current-note').textContent = midiToName(nextNote);
       playSynthNote(nextNote, duration);
 
       timerId = setTimeout(step, duration * 1000);
     }
 
     function togglePlayback() {
-      const btn = document.getElementById('play-btn');
-      
       if (!isPlaying) {
         isPlaying = true;
+        currentNoteCount = 0;
+        generatedHistory = [];
+        const btn = document.getElementById('play-btn');
         btn.textContent = '⏸ Pause Stream';
         btn.style.backgroundColor = '#ef4444';
         step();
       } else {
-        isPlaying = false;
-        clearTimeout(timerId);
-        btn.textContent = '▶ Play Infinite Stream';
-        btn.style.backgroundColor = 'var(--accent)';
+        stopPlayback();
       }
     }
 
-    // Handle Uploaded MIDI Binary Parser
-    document.getElementById('midi-file').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+    function stopPlayback() {
+      isPlaying = false;
+      clearTimeout(timerId);
+      const btn = document.getElementById('play-btn');
+      btn.textContent = '▶ Play Stream';
+      btn.style.backgroundColor = 'var(--accent)';
+    }
 
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        const bytes = new Uint8Array(evt.target.result);
-        const parsedNotes = parseMidiFileNotes(bytes);
+    // MULTI-FILE MIDI UPLOAD HANDLER
+    document.getElementById('midi-file').addEventListener('change', async function(e) {
+      const files = Array.from(e.target.files);
+      if (!files.length) return;
 
-        if (parsedNotes.length > 0) {
-          dataset = parsedNotes;
-          document.getElementById('dataset-status').textContent = `Dataset Loaded: ${dataset.length} Custom File Notes`;
-          document.getElementById('dataset-status').classList.add('active');
-          buildMatrix();
-          logMessage(`Successfully parsed ${parsedNotes.length} notes from uploaded MIDI.`);
-        } else {
-          alert('Could not extract note events from file.');
+      let combinedNotes = [];
+      let parsedCount = 0;
+
+      for (const file of files) {
+        try {
+          const buffer = await file.arrayBuffer();
+          const bytes = new Uint8Array(buffer);
+          const parsed = parseMidiFileNotes(bytes);
+          if (parsed.length > 0) {
+            combinedNotes.push(...parsed);
+            parsedCount++;
+          }
+        } catch (err) {
+          console.error("Error parsing file:", file.name, err);
         }
-      };
-      reader.readAsArrayBuffer(file);
+      }
+
+      if (combinedNotes.length > 0) {
+        dataset = combinedNotes;
+        const badge = document.getElementById('dataset-status');
+        badge.textContent = `Dataset Loaded: ${dataset.length} Combined Notes (${parsedCount} File/s)`;
+        badge.classList.add('active');
+        buildMatrix();
+        logMessage(`Processed ${parsedCount} MIDI files into a single matrix dataset.`);
+      } else {
+        alert('Could not extract valid note events from selected files.');
+      }
     });
 
-    // Parse Pitch Sequence from standard MIDI binary bytes
+    // Extract raw MIDI notes from binary
     function parseMidiFileNotes(bytes) {
       const notes = [];
       for (let i = 0; i < bytes.length - 2; i++) {
-        // Look for Note On commands (0x90) with velocity > 0
         if ((bytes[i] & 0xF0) === 0x90 && bytes[i + 2] > 0) {
           const pitch = bytes[i + 1];
           if (pitch >= 21 && pitch <= 108) {
@@ -414,11 +453,20 @@
       return notes;
     }
 
-    // Export Generated Stream as MIDI file
+    // Export generated MIDI file
     function exportMidi() {
-      if (generatedHistory.length === 0) {
-        alert('Generate some notes by playing the stream first.');
-        return;
+      const targetLengthVal = document.getElementById('length-select').value;
+      let notesToExport = [];
+
+      if (generatedHistory.length > 0) {
+        notesToExport = [...generatedHistory];
+      } else {
+        // Pre-generate notes if user clicks export without playing first
+        const maxNotes = targetLengthVal === 'infinite' ? 64 : parseInt(targetLengthVal);
+        currentHistory = [];
+        for (let i = 0; i < maxNotes; i++) {
+          notesToExport.push(getNextNote());
+        }
       }
 
       const bpm = parseInt(document.getElementById('tempo-input').value) || 120;
@@ -433,9 +481,9 @@
         microsecondsPerQuarter & 0xFF
       );
 
-      generatedHistory.forEach(note => {
-        trackData.push(0x00, 0x90, note, 0x5A); // Note On
-        trackData.push(0x60, 0x80, note, 0x00); // Note Off after quarter note
+      notesToExport.forEach(note => {
+        trackData.push(0x00, 0x90, note, 0x5A);
+        trackData.push(0x60, 0x80, note, 0x00);
       });
 
       trackData.push(0x00, 0xFF, 0x2F, 0x00);
@@ -449,11 +497,11 @@
       const blob = new Blob([new Uint8Array([...header, ...trackHeader, ...trackLenBytes, ...trackData])], { type: 'audio/midi' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'markov_generated_sequence.mid';
+      a.download = `markov_sequence_${notesToExport.length}notes.mid`;
       a.click();
+      logMessage(`Exported ${notesToExport.length}-note MIDI file.`);
     }
 
-    // Initialize default state
     buildMatrix();
   </script>
 </body>
