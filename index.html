@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Markov Companion Pro - Sustained Multi-Track DAW MIDI Exporter</title>
+  <title>Markov Companion Pro - 4-Track DAW Engine with Drum Percussion</title>
   <style>
     :root {
       --bg-color: #0f172a;
@@ -15,6 +15,7 @@
       --border-color: #334155;
       --success: #10b981;
       --danger: #ef4444;
+      --warning: #f59e0b;
     }
 
     * {
@@ -35,7 +36,7 @@
 
     .container {
       width: 100%;
-      max-width: 1000px;
+      max-width: 1050px;
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
@@ -67,7 +68,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
       gap: 1rem;
     }
 
@@ -161,6 +162,30 @@
       border: 1px solid rgba(16, 185, 129, 0.4);
     }
 
+    .mixer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+    }
+
+    .mixer-btn {
+      padding: 0.5rem;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+      border: 1px solid var(--border-color);
+      background: var(--bg-color);
+      color: var(--text-muted);
+    }
+
+    .mixer-btn.active {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: var(--accent);
+      color: var(--text-main);
+      font-weight: bold;
+    }
+
     .visualizer-box {
       height: 70px;
       background-color: var(--bg-color);
@@ -169,7 +194,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: bold;
       color: var(--accent);
       letter-spacing: 0.05em;
@@ -201,8 +226,8 @@
 
   <div class="container">
     <header>
-      <h1>Markov Chain Melody Companion Pro</h1>
-      <p>Precision Sustained Multi-Track DAW MIDI Generator</p>
+      <h1>Markov Chain Melody & Percussion Companion</h1>
+      <p>4-Track DAW MIDI Synthesizer with Matching Drum Patterns & Bar Alignment</p>
     </header>
 
     <div class="card">
@@ -211,16 +236,18 @@
         <div class="form-group">
           <label for="preset-select">Style Preset Library</label>
           <select id="preset-select" onchange="updateDatasetBlend()">
-            <option value="baroque">1. Baroque Bach Counterpoint</option>
-            <option value="chopin">2. Romantic Chopin Nocturne</option>
-            <option value="jazz">3. Jazz Bebop & Blues</option>
-            <option value="synthwave">4. 80s Synthwave Cyber Arp</option>
-            <option value="funk">5. Funk Slap Bass & Groove</option>
-            <option value="flamenco">6. Spanish Flamenco Run</option>
-            <option value="lofi">7. Lo-Fi Hip Hop Chill</option>
-            <option value="heroic">8. Cinematic Heroic Brass</option>
-            <option value="pentatonic">9. Asian Pentatonic Folk</option>
-            <option value="ambient">10. Lydian Ambient Drone</option>
+            <option value="pop" selected>1. Modern Pop Anthem</option>
+            <option value="rock">2. Classic Hard Rock Riff</option>
+            <option value="baroque">3. Baroque Bach Counterpoint</option>
+            <option value="chopin">4. Romantic Chopin Nocturne</option>
+            <option value="jazz">5. Jazz Bebop & Blues</option>
+            <option value="synthwave">6. 80s Synthwave Cyber Arp</option>
+            <option value="funk">7. Funk Slap Bass & Groove</option>
+            <option value="flamenco">8. Spanish Flamenco Run</option>
+            <option value="lofi">9. Lo-Fi Hip Hop Chill</option>
+            <option value="heroic">10. Cinematic Heroic Brass</option>
+            <option value="pentatonic">11. Asian Pentatonic Folk</option>
+            <option value="ambient">12. Lydian Ambient Drone</option>
           </select>
         </div>
 
@@ -231,77 +258,98 @@
 
         <div class="form-group">
           <div class="form-group-row">
-            <label for="blend-slider">Source Blend (Uploaded vs Preset)</label>
+            <label for="blend-slider">Source Blend (Preset vs Upload)</label>
             <span class="val-display" id="blend-val">100% Preset / 0% Upload</span>
           </div>
           <input type="range" id="blend-slider" min="0" max="1" step="0.05" value="1" oninput="updateDatasetBlend()">
         </div>
       </div>
-      <div id="dataset-status" class="status-badge">Dataset Active: Baroque Preset</div>
+      <div id="dataset-status" class="status-badge">Dataset Active: Pop Preset</div>
     </div>
 
     <div class="card">
-      <h3>2. Markov Engine & Harmonizer Controls</h3>
+      <h3>2. Sequence Structure, Key & Harmony Controls</h3>
       <div class="grid">
+        <div class="form-group">
+          <label for="bars-select">Target Sequence Length (Bars)</label>
+          <select id="bars-select">
+            <option value="4">4 Bars (Short Loop)</option>
+            <option value="8" selected>8 Bars (Standard Verse / Chorus)</option>
+            <option value="16">16 Bars (Extended Section)</option>
+            <option value="32">32 Bars (Full Sequence)</option>
+            <option value="infinite">Infinite Real-time Stream</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="root-select">Key Root Note</label>
+          <select id="root-select">
+            <option value="0" selected>C</option>
+            <option value="1">C# / Db</option>
+            <option value="2">D</option>
+            <option value="3">D# / Eb</option>
+            <option value="4">E</option>
+            <option value="5">F</option>
+            <option value="6">F# / Gb</option>
+            <option value="7">G</option>
+            <option value="8">G# / Ab</option>
+            <option value="9">A</option>
+            <option value="10">A# / Bb</option>
+            <option value="11">B</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="scale-select">Scale Mode</label>
+          <select id="scale-select">
+            <option value="major" selected>Major (Ionian)</option>
+            <option value="minor">Natural Minor (Aeolian)</option>
+            <option value="harmonic_minor">Harmonic Minor</option>
+            <option value="dorian">Dorian</option>
+            <option value="phrygian">Phrygian</option>
+            <option value="lydian">Lydian</option>
+            <option value="mixolydian">Mixolydian</option>
+            <option value="pentatonic_major">Pentatonic Major</option>
+            <option value="pentatonic_minor">Pentatonic Minor</option>
+            <option value="blues">Blues Scale</option>
+          </select>
+        </div>
+
         <div class="form-group">
           <label for="order-select">Markov Order (N-Gram)</label>
           <select id="order-select" onchange="buildMatrix()">
             <option value="1">Order 1 (High Variation)</option>
-            <option value="2" selected>Order 2 (Balanced Phrases)</option>
-            <option value="3">Order 3 (Strict Motif Clone)</option>
+            <option value="2" selected>Order 2 (Balanced Motifs)</option>
+            <option value="3">Order 3 (Strict Style Clone)</option>
           </select>
         </div>
 
         <div class="form-group">
           <label for="chord-select">Auto-Harmonizer Mode</label>
           <select id="chord-select">
-            <option value="off">Off (Single Melody Line)</option>
+            <option value="off">Off (Melody Only)</option>
             <option value="dyad3">Diatonic Dyad (3rd Above)</option>
-            <option value="dyad6">Diatonic Dyad (6th Below)</option>
             <option value="triad">Diatonic Triad Chords</option>
             <option value="seventh">7th Chord Harmony</option>
-            <option value="bass">Melody + Sub-Bass Anchor</option>
-            <option value="full" selected>Full Band (Melody + Chords + Bass)</option>
+            <option value="full" selected>Full DAW Band (Melody + Chords + Bass)</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label for="chord-sustain-select">Chord / Pad Sustain Mode</label>
-          <select id="chord-sustain-select">
-            <option value="whole" selected>Whole Note Pad (1 Bar Hold / 4 Beats)</option>
-            <option value="half">Half Note Pad (2 Beats)</option>
-            <option value="two_bars">2 Bars Sustained Drone (8 Beats)</option>
-            <option value="matching">Match Melody Note Duration</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="scale-select">Key / Scale Lock</label>
-          <select id="scale-select">
-            <option value="chromatic">Off (Raw Pitch Inputs)</option>
-            <option value="major" selected>C Major (Ionian)</option>
-            <option value="minor">A Natural Minor (Aeolian)</option>
-            <option value="harmonic_minor">A Harmonic Minor</option>
-            <option value="melodic_minor">A Melodic Minor</option>
-            <option value="dorian">D Dorian</option>
-            <option value="phrygian">E Phrygian</option>
-            <option value="lydian">F Lydian</option>
-            <option value="mixolydian">G Mixolydian</option>
-            <option value="pentatonic_major">C Pentatonic Major</option>
-            <option value="pentatonic_minor">A Pentatonic Minor</option>
-            <option value="blues">A Blues Scale</option>
-            <option value="hirajoshi">Japanese Hirajoshi</option>
-            <option value="hungarian">Hungarian Minor</option>
-            <option value="whole_tone">Whole Tone Scale</option>
+          <label for="drum-mode-select">Drum Track Mode (Ch 10 MIDI)</label>
+          <select id="drum-mode-select">
+            <option value="preset" selected>Style-Matched Rhythm Pattern</option>
+            <option value="four_floor">Straight 4-on-the-Floor</option>
+            <option value="off">Drums Disabled</option>
           </select>
         </div>
 
         <div class="form-group">
           <div class="form-group-row">
-            <label for="temp-input">Temperature</label>
-            <span class="val-display" id="temp-val">1.0</span>
+            <label for="humanize-slider">Groove / Humanize</label>
+            <span class="val-display" id="humanize-val">15%</span>
           </div>
-          <input type="range" id="temp-input" min="0.2" max="3.0" step="0.1" value="1.0" oninput="document.getElementById('temp-val').textContent = this.value">
+          <input type="range" id="humanize-slider" min="0" max="0.4" step="0.05" value="0.15" oninput="document.getElementById('humanize-val').textContent = Math.round(this.value * 100) + '%'">
         </div>
 
         <div class="form-group">
@@ -312,117 +360,188 @@
     </div>
 
     <div class="card">
-      <h3>3. Performance Visualizer & Multi-Track Export</h3>
+      <h3>3. Real-Time DAW Mixer & Performance Visualizer</h3>
       
+      <div class="form-group">
+        <label>DAW Real-Time Track Mute Control</label>
+        <div class="mixer-grid">
+          <div class="mixer-btn active" id="mute-mel" onclick="toggleMute('mel')">Lead Track [ON]</div>
+          <div class="mixer-btn active" id="mute-chd" onclick="toggleMute('chd')">Chord Track [ON]</div>
+          <div class="mixer-btn active" id="mute-bas" onclick="toggleMute('bas')">Bass Track [ON]</div>
+          <div class="mixer-btn active" id="mute-drm" onclick="toggleMute('drm')">Drum Track [ON]</div>
+        </div>
+      </div>
+
       <div class="visualizer-box" id="current-note">--</div>
 
       <div class="form-group">
         <label>Piano Roll Visualizer</label>
-        <canvas id="piano-roll" width="800" height="160"></canvas>
+        <canvas id="piano-roll" width="850" height="160"></canvas>
       </div>
 
       <div class="btn-group">
         <button class="btn" id="play-btn" style="flex: 2;" onclick="togglePlayback()">▶ Play Performance</button>
-        <button class="btn btn-secondary" style="flex: 1.5;" onclick="exportMultiTrackMidi()">Export DAW Multi-Track MIDI (.mid)</button>
+        <button class="btn btn-secondary" style="flex: 1.5;" onclick="exportMultiTrackMidi()">Export 4-Track DAW MIDI (.mid)</button>
       </div>
 
       <div class="form-group">
         <label>Activity Log</label>
-        <div class="log-box" id="log-box">Engine ready with Absolute Timestamp Queue Exporter.</div>
+        <div class="log-box" id="log-box">4-Track Engine ready. Style-aware percussion & GM Channel 10 enabled.</div>
       </div>
     </div>
   </div>
 
   <script>
+    // Percussion GM Note Standard Definitions:
+    // 36: Kick, 38: Snare, 42: Closed Hi-Hat, 46: Open Hi-Hat, 49: Crash
     const PRESET_LIBRARY = {
+      pop: {
+        name: "Modern Pop Anthem",
+        synth: { type: 'sine', filterFreq: 3200 },
+        data: createPresetPattern([
+          { p: [60, 64, 67, 72, 71, 69, 67, 64], d: 0.5, v: 100 },
+          { p: [65, 67, 69, 72, 74, 72, 69, 67], d: 0.5, v: 105 },
+          { p: [64, 67, 72, 76, 74, 72, 67, 64], d: 0.5, v: 95 }
+        ]),
+        drums: [
+          { beat: 0.0, pitch: 36, v: 110 }, { beat: 0.0, pitch: 42, v: 80 },
+          { beat: 0.5, pitch: 42, v: 75 },
+          { beat: 1.0, pitch: 38, v: 115 }, { beat: 1.0, pitch: 42, v: 85 },
+          { beat: 1.5, pitch: 42, v: 75 },
+          { beat: 2.0, pitch: 36, v: 105 }, { beat: 2.0, pitch: 42, v: 80 },
+          { beat: 2.5, pitch: 36, v: 95 },  { beat: 2.5, pitch: 42, v: 75 },
+          { beat: 3.0, pitch: 38, v: 115 }, { beat: 3.0, pitch: 42, v: 85 },
+          { beat: 3.5, pitch: 46, v: 90 }
+        ]
+      },
+      rock: {
+        name: "Classic Hard Rock Riff",
+        synth: { type: 'sawtooth', filterFreq: 4500 },
+        data: createPresetPattern([
+          { p: [45, 45, 48, 45, 50, 45, 48, 50], d: 0.25, v: 115 },
+          { p: [52, 50, 48, 45, 43, 45], d: 0.5, v: 120 }
+        ]),
+        drums: [
+          { beat: 0.0, pitch: 36, v: 120 }, { beat: 0.0, pitch: 49, v: 110 },
+          { beat: 0.5, pitch: 42, v: 85 },
+          { beat: 1.0, pitch: 38, v: 120 }, { beat: 1.0, pitch: 42, v: 90 },
+          { beat: 1.5, pitch: 42, v: 85 },
+          { beat: 2.0, pitch: 36, v: 115 }, { beat: 2.25, pitch: 36, v: 95 }, { beat: 2.5, pitch: 42, v: 85 },
+          { beat: 3.0, pitch: 38, v: 120 }, { beat: 3.5, pitch: 46, v: 95 }
+        ]
+      },
       baroque: {
         name: "Baroque Bach Counterpoint",
-        synth: { type: 'sawtooth', attack: 0.01, decay: 0.2, filterFreq: 2500 },
+        synth: { type: 'sawtooth', filterFreq: 2500 },
         data: createPresetPattern([
-          { p: [60, 62, 64, 65, 67, 65, 64, 62, 60, 67, 69, 71, 72, 71, 69, 67], d: 0.25, v: 90 },
-          { p: [65, 64, 62, 60, 64, 67, 72, 60, 62, 64, 65, 67, 65, 64, 62], d: 0.25, v: 85 },
-          { p: [60, 67, 69, 71, 72, 71, 69, 67, 65, 64, 62, 60, 64, 67, 72], d: 0.5, v: 105 }
-        ])
+          { p: [60, 62, 64, 65, 67, 65, 64, 62, 60, 67, 69, 71, 72, 71, 69, 67], d: 0.25, v: 90 }
+        ]),
+        drums: [
+          { beat: 0.0, pitch: 42, v: 60 }, { beat: 1.0, pitch: 42, v: 60 },
+          { beat: 2.0, pitch: 42, v: 60 }, { beat: 3.0, pitch: 42, v: 60 }
+        ]
       },
       chopin: {
         name: "Romantic Chopin Nocturne",
-        synth: { type: 'sine', attack: 0.04, decay: 0.8, filterFreq: 1800 },
+        synth: { type: 'sine', filterFreq: 1800 },
         data: createPresetPattern([
           { p: [60, 63, 67, 70], d: 0.5, v: 70 },
-          { p: [72, 75, 74, 72, 70], d: 0.33, v: 95 },
-          { p: [67, 63, 60, 58], d: 0.25, v: 60 },
-          { p: [62, 65, 68, 70, 74, 72, 70, 67], d: 0.5, v: 85 }
-        ])
+          { p: [72, 75, 74, 72, 70], d: 0.33, v: 95 }
+        ]),
+        drums: [] // Soft ambient orchestral feel, minimal percussion
       },
       jazz: {
         name: "Jazz Bebop & Blues",
-        synth: { type: 'triangle', attack: 0.01, decay: 0.25, filterFreq: 3000 },
+        synth: { type: 'triangle', filterFreq: 3000 },
         data: createPresetPattern([
           { p: [60, 63, 65, 66, 67], d: 0.33, v: 95 },
-          { p: [70, 72, 70, 67], d: 0.17, v: 75 },
-          { p: [66, 65, 63, 60], d: 0.5, v: 105 },
-          { p: [58, 60, 63, 65, 67, 70, 72], d: 0.25, v: 85 }
-        ])
+          { p: [70, 72, 70, 67], d: 0.17, v: 75 }
+        ]),
+        drums: [
+          { beat: 0.0, pitch: 42, v: 80 }, { beat: 0.66, pitch: 42, v: 60 },
+          { beat: 1.0, pitch: 38, v: 70 }, { beat: 1.0, pitch: 42, v: 85 },
+          { beat: 2.0, pitch: 42, v: 80 }, { beat: 2.66, pitch: 42, v: 60 },
+          { beat: 3.0, pitch: 38, v: 70 }, { beat: 3.0, pitch: 42, v: 85 }
+        ]
       },
       synthwave: {
         name: "80s Synthwave Cyber Arp",
-        synth: { type: 'square', attack: 0.005, decay: 0.15, filterFreq: 4000 },
+        synth: { type: 'square', filterFreq: 4000 },
         data: createPresetPattern([
           { p: [36, 48, 36, 51, 36, 53, 36, 55, 36, 53, 36, 51, 36, 48, 36, 46], d: 0.25, v: 110 }
-        ])
+        ]),
+        drums: [
+          { beat: 0.0, pitch: 36, v: 115 }, { beat: 0.5, pitch: 42, v: 80 },
+          { beat: 1.0, pitch: 38, v: 110 }, { beat: 1.5, pitch: 42, v: 80 },
+          { beat: 2.0, pitch: 36, v: 115 }, { beat: 2.5, pitch: 42, v: 80 },
+          { beat: 3.0, pitch: 38, v: 110 }, { beat: 3.5, pitch: 42, v: 80 }
+        ]
       },
       funk: {
         name: "Funk Slap Bass & Groove",
-        synth: { type: 'sawtooth', attack: 0.005, decay: 0.12, filterFreq: 5000 },
+        synth: { type: 'sawtooth', filterFreq: 5000 },
         data: createPresetPattern([
-          { p: [38, 38], d: 0.125, v: 120 },
-          { p: [50], d: 0.25, v: 100 },
-          { p: [38, 41, 43], d: 0.125, v: 115 },
-          { p: [45, 43, 41, 38], d: 0.25, v: 90 }
-        ])
+          { p: [38, 38], d: 0.125, v: 120 }, { p: [50], d: 0.25, v: 100 },
+          { p: [38, 41, 43], d: 0.125, v: 115 }, { p: [45, 43, 41, 38], d: 0.25, v: 90 }
+        ]),
+        drums: [
+          { beat: 0.0, pitch: 36, v: 120 }, { beat: 0.25, pitch: 42, v: 75 }, { beat: 0.5, pitch: 42, v: 85 },
+          { beat: 1.0, pitch: 38, v: 115 }, { beat: 1.75, pitch: 36, v: 100 },
+          { beat: 2.0, pitch: 42, v: 85 }, { beat: 2.5, pitch: 36, v: 110 },
+          { beat: 3.0, pitch: 38, v: 115 }, { beat: 3.5, pitch: 46, v: 95 }
+        ]
       },
       flamenco: {
         name: "Spanish Flamenco Run",
-        synth: { type: 'triangle', attack: 0.01, decay: 0.18, filterFreq: 3500 },
+        synth: { type: 'triangle', filterFreq: 3500 },
         data: createPresetPattern([
-          { p: [64, 63, 61, 60], d: 0.16, v: 100 },
-          { p: [65, 64, 63, 61], d: 0.16, v: 110 },
-          { p: [60, 59, 57, 56, 57, 59, 60], d: 0.25, v: 85 }
-        ])
+          { p: [64, 63, 61, 60], d: 0.16, v: 100 }, { p: [65, 64, 63, 61], d: 0.16, v: 110 }
+        ]),
+        drums: [
+          { beat: 0.0, pitch: 38, v: 70 }, { beat: 0.75, pitch: 38, v: 85 },
+          { beat: 1.5, pitch: 38, v: 95 }, { beat: 2.25, pitch: 38, v: 70 }, { beat: 3.0, pitch: 38, v: 110 }
+        ]
       },
       lofi: {
         name: "Lo-Fi Hip Hop Chill",
-        synth: { type: 'sine', attack: 0.03, decay: 0.6, filterFreq: 1200 },
+        synth: { type: 'sine', filterFreq: 1200 },
         data: createPresetPattern([
-          { p: [57, 60, 64, 67], d: 0.75, v: 65 },
-          { p: [55, 59, 62, 66], d: 0.75, v: 60 },
-          { p: [53, 57, 60, 64], d: 0.5, v: 70 }
-        ])
+          { p: [57, 60, 64, 67], d: 0.75, v: 65 }, { p: [55, 59, 62, 66], d: 0.75, v: 60 }
+        ]),
+        drums: [
+          { beat: 0.0, pitch: 36, v: 95 }, { beat: 0.75, pitch: 42, v: 65 },
+          { beat: 1.0, pitch: 38, v: 90 }, { beat: 2.25, pitch: 36, v: 85 },
+          { beat: 3.0, pitch: 38, v: 90 }, { beat: 3.75, pitch: 46, v: 70 }
+        ]
       },
       heroic: {
         name: "Cinematic Heroic Brass",
-        synth: { type: 'sawtooth', attack: 0.05, decay: 0.4, filterFreq: 2200 },
+        synth: { type: 'sawtooth', filterFreq: 2200 },
         data: createPresetPattern([
-          { p: [60, 67, 72], d: 0.5, v: 115 },
-          { p: [74, 76, 72], d: 0.25, v: 120 },
-          { p: [67, 65, 67, 72], d: 1.0, v: 110 }
-        ])
+          { p: [60, 67, 72], d: 0.5, v: 115 }, { p: [74, 76, 72], d: 0.25, v: 120 }
+        ]),
+        drums: [
+          { beat: 0.0, pitch: 36, v: 125 }, { beat: 0.0, pitch: 49, v: 120 },
+          { beat: 1.5, pitch: 38, v: 110 }, { beat: 2.0, pitch: 36, v: 115 }, { beat: 3.0, pitch: 38, v: 120 }
+        ]
       },
       pentatonic: {
         name: "Asian Pentatonic Folk",
-        synth: { type: 'sine', attack: 0.02, decay: 0.5, filterFreq: 2800 },
+        synth: { type: 'sine', filterFreq: 2800 },
         data: createPresetPattern([
-          { p: [60, 62, 65, 67, 69, 72], d: 0.5, v: 85 },
-          { p: [69, 67, 65, 62, 60], d: 0.5, v: 75 }
-        ])
+          { p: [60, 62, 65, 67, 69, 72], d: 0.5, v: 85 }
+        ]),
+        drums: [
+          { beat: 0.0, pitch: 36, v: 90 }, { beat: 2.0, pitch: 38, v: 80 }
+        ]
       },
       ambient: {
         name: "Lydian Ambient Drone",
-        synth: { type: 'sine', attack: 0.1, decay: 1.2, filterFreq: 1500 },
+        synth: { type: 'sine', filterFreq: 1500 },
         data: createPresetPattern([
-          { p: [60, 62, 66, 67, 71, 72], d: 1.0, v: 60 },
-          { p: [74, 72, 71, 67, 66], d: 1.5, v: 55 }
-        ])
+          { p: [60, 62, 66, 67, 71, 72], d: 1.0, v: 60 }
+        ]),
+        drums: []
       }
     };
 
@@ -437,21 +556,16 @@
     }
 
     const SCALES = {
-      chromatic: null,
       major: [0, 2, 4, 5, 7, 9, 11],
       minor: [0, 2, 3, 5, 7, 8, 10],
       harmonic_minor: [0, 2, 3, 5, 7, 8, 11],
-      melodic_minor: [0, 2, 3, 5, 7, 9, 11],
       dorian: [0, 2, 3, 5, 7, 9, 10],
       phrygian: [0, 1, 3, 5, 7, 8, 10],
       lydian: [0, 2, 4, 6, 7, 9, 11],
       mixolydian: [0, 2, 4, 5, 7, 9, 10],
       pentatonic_major: [0, 2, 4, 7, 9],
       pentatonic_minor: [0, 3, 5, 7, 10],
-      blues: [0, 3, 5, 6, 7, 10],
-      hirajoshi: [0, 2, 3, 7, 8],
-      hungarian: [0, 2, 3, 6, 7, 8, 11],
-      whole_tone: [0, 2, 4, 6, 8, 10]
+      blues: [0, 3, 5, 6, 7, 10]
     };
 
     let uploadedDataset = [];
@@ -462,130 +576,107 @@
     let timerId = null;
     let currentHistory = [];
     let generatedHistory = [];
+    let currentBeatCount = 0;
 
-    const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-    const MIN_MIDI = 36;
-    const MAX_MIDI = 84;
+    const muteState = { mel: true, chd: true, bas: true, drm: true };
 
-    function midiToName(midi) {
-      const name = NOTE_NAMES[midi % 12];
-      const octave = Math.floor(midi / 12) - 1;
-      return `${name}${octave}`;
+    function toggleMute(trackKey) {
+      muteState[trackKey] = !muteState[trackKey];
+      const btn = document.getElementById(`mute-${trackKey}`);
+      const labels = { mel: 'Lead Track', chd: 'Chord Track', bas: 'Bass Track', drm: 'Drum Track' };
+      if (muteState[trackKey]) {
+        btn.classList.add('active');
+        btn.textContent = `${labels[trackKey]} [ON]`;
+      } else {
+        btn.classList.remove('active');
+        btn.textContent = `${labels[trackKey]} [MUTED]`;
+      }
     }
 
+    const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    function midiToName(midi) {
+      return `${NOTE_NAMES[midi % 12]}${Math.floor(midi / 12) - 1}`;
+    }
     function midiToFreq(midi) {
       return 440 * Math.pow(2, (midi - 69) / 12);
     }
-
     function getNoteStateKey(noteArray) {
       return noteArray.map(n => `${n.pitch}:${n.duration}:${n.velocity}`).join('|');
     }
 
     function quantizeToScale(midiNote) {
+      const rootOffset = parseInt(document.getElementById('root-select').value) || 0;
       const scaleKey = document.getElementById('scale-select').value;
-      const scalePattern = SCALES[scaleKey];
-      if (!scalePattern) return midiNote;
+      const scalePattern = SCALES[scaleKey] || SCALES.major;
 
-      const octave = Math.floor(midiNote / 12);
-      const pitchClass = (midiNote % 12 + 12) % 12;
-
+      const relativePitch = (midiNote - rootOffset + 120) % 12;
       let closest = scalePattern[0];
-      let minDiff = Math.abs(pitchClass - closest);
+      let minDiff = Math.abs(relativePitch - closest);
 
       for (let degree of scalePattern) {
-        let diff = Math.abs(pitchClass - degree);
+        let diff = Math.abs(relativePitch - degree);
         if (diff < minDiff) {
           minDiff = diff;
           closest = degree;
         }
       }
 
-      return (octave * 12) + closest;
+      const octave = Math.floor((midiNote - relativePitch) / 12);
+      return (octave * 12) + rootOffset + closest;
     }
 
-    // --- HARMONIZER & SUSTAIN CALCULATOR ---
     function getSeparatedTrackPitches(leadPitch, melDuration) {
       const mode = document.getElementById('chord-select').value;
-      const sustainSetting = document.getElementById('chord-sustain-select').value;
+      const rootOffset = parseInt(document.getElementById('root-select').value) || 0;
       const scaleKey = document.getElementById('scale-select').value;
-      const scalePattern = SCALES[scaleKey] || [0, 2, 4, 5, 7, 9, 11];
+      const scalePattern = SCALES[scaleKey] || SCALES.major;
 
-      const octave = Math.floor(leadPitch / 12);
-      const pitchClass = (leadPitch % 12 + 12) % 12;
-
-      let degreeIdx = scalePattern.indexOf(pitchClass);
+      const relativePitch = (leadPitch - rootOffset + 120) % 12;
+      let degreeIdx = scalePattern.indexOf(relativePitch);
       if (degreeIdx === -1) degreeIdx = 0;
 
       const getDegreePitch = (scaleOffset) => {
         const targetIdx = (degreeIdx + scaleOffset) % scalePattern.length;
         const octaveOffset = Math.floor((degreeIdx + scaleOffset) / scalePattern.length);
-        return ((octave + octaveOffset) * 12) + scalePattern[targetIdx];
+        return Math.floor(leadPitch / 12) * 12 + rootOffset + scalePattern[targetIdx] + (octaveOffset * 12);
       };
 
-      // Sustained Durations for Chords & Bass (in Beats/Quarter Notes)
-      let chordDuration = melDuration;
-      let bassDuration = melDuration;
-
-      if (sustainSetting === 'half') {
-        chordDuration = 2.0; // 2 Beats
-        bassDuration = 2.0;
-      } else if (sustainSetting === 'whole') {
-        chordDuration = 4.0; // 4 Beats (1 Bar)
-        bassDuration = 4.0;
-      } else if (sustainSetting === 'two_bars') {
-        chordDuration = 8.0; // 8 Beats (2 Bars)
-        bassDuration = 8.0;
-      }
-
-      const parts = {
-        melody: [{ pitch: leadPitch, duration: melDuration }],
-        chords: [],
-        bass: []
-      };
+      const parts = { melody: [{ pitch: leadPitch, duration: melDuration }], chords: [], bass: [] };
 
       switch (mode) {
         case 'dyad3':
-          parts.chords.push({ pitch: getDegreePitch(2), duration: chordDuration });
-          break;
-        case 'dyad6':
-          parts.chords.push({ pitch: getDegreePitch(5) - 12, duration: chordDuration });
+          parts.chords.push({ pitch: getDegreePitch(2), duration: melDuration });
           break;
         case 'triad':
-          parts.chords.push({ pitch: getDegreePitch(2), duration: chordDuration });
-          parts.chords.push({ pitch: getDegreePitch(4), duration: chordDuration });
+          parts.chords.push({ pitch: getDegreePitch(2), duration: 4.0 });
+          parts.chords.push({ pitch: getDegreePitch(4), duration: 4.0 });
           break;
         case 'seventh':
-          parts.chords.push({ pitch: getDegreePitch(2), duration: chordDuration });
-          parts.chords.push({ pitch: getDegreePitch(4), duration: chordDuration });
-          parts.chords.push({ pitch: getDegreePitch(6), duration: chordDuration });
-          break;
-        case 'bass':
-          parts.bass.push({ pitch: getDegreePitch(0) - 24, duration: bassDuration });
+          parts.chords.push({ pitch: getDegreePitch(2), duration: 4.0 });
+          parts.chords.push({ pitch: getDegreePitch(4), duration: 4.0 });
+          parts.chords.push({ pitch: getDegreePitch(6), duration: 4.0 });
           break;
         case 'full':
-          parts.chords.push({ pitch: getDegreePitch(2), duration: chordDuration });
-          parts.chords.push({ pitch: getDegreePitch(4), duration: chordDuration });
-          parts.bass.push({ pitch: getDegreePitch(0) - 24, duration: bassDuration });
+          parts.chords.push({ pitch: getDegreePitch(2), duration: 4.0 });
+          parts.chords.push({ pitch: getDegreePitch(4), duration: 4.0 });
+          parts.bass.push({ pitch: getDegreePitch(0) - 24, duration: 4.0 });
           break;
       }
-
       return parts;
     }
 
     function updateDatasetBlend() {
       const blendWeight = parseFloat(document.getElementById('blend-slider').value);
       const presetKey = document.getElementById('preset-select').value;
-      const presetObj = PRESET_LIBRARY[presetKey] || PRESET_LIBRARY.baroque;
+      const presetObj = PRESET_LIBRARY[presetKey] || PRESET_LIBRARY.pop;
 
-      const blendLabel = document.getElementById('blend-val');
-      blendLabel.textContent = `${Math.round(blendWeight * 100)}% Preset / ${Math.round((1 - blendWeight) * 100)}% Upload`;
+      document.getElementById('blend-val').textContent = `${Math.round(blendWeight * 100)}% Preset / ${Math.round((1 - blendWeight) * 100)}% Upload`;
 
       if (uploadedDataset.length === 0) {
         dataset = [...presetObj.data];
       } else {
         const presetCount = Math.round(presetObj.data.length * blendWeight);
         const uploadCount = Math.round(uploadedDataset.length * (1 - blendWeight));
-
         dataset = [
           ...presetObj.data.slice(0, Math.max(1, presetCount)),
           ...uploadedDataset.slice(0, Math.max(1, uploadCount))
@@ -595,7 +686,6 @@
       const badge = document.getElementById('dataset-status');
       badge.textContent = `Dataset Active: ${presetObj.name} (${dataset.length} Note Objects)`;
       badge.classList.add('active');
-
       buildMatrix();
     }
 
@@ -608,15 +698,11 @@
         const stateKey = getNoteStateKey(slice);
         const nextNoteObj = dataset[i + order];
 
-        if (!transitionMatrix[stateKey]) {
-          transitionMatrix[stateKey] = {};
-        }
-
+        if (!transitionMatrix[stateKey]) transitionMatrix[stateKey] = {};
         const noteKey = `${nextNoteObj.pitch}:${nextNoteObj.duration}:${nextNoteObj.velocity}`;
         transitionMatrix[stateKey][noteKey] = (transitionMatrix[stateKey][noteKey] || 0) + 1;
       }
-
-      logMessage(`Matrix rebuilt. Order: ${order}, Total States: ${Object.keys(transitionMatrix).length}`);
+      logMessage(`Matrix updated. Order: ${order}, Total States: ${Object.keys(transitionMatrix).length}`);
     }
 
     function logMessage(msg) {
@@ -627,11 +713,7 @@
 
     function getNextNoteObject() {
       const order = parseInt(document.getElementById('order-select').value);
-      const temp = parseFloat(document.getElementById('temp-input').value) || 1.0;
-
-      if (currentHistory.length < order) {
-        currentHistory = dataset.slice(0, order);
-      }
+      if (currentHistory.length < order) currentHistory = dataset.slice(0, order);
 
       for (let currentOrder = order; currentOrder >= 1; currentOrder--) {
         const stateKey = getNoteStateKey(currentHistory.slice(-currentOrder));
@@ -639,51 +721,94 @@
 
         if (optionsMap && Object.keys(optionsMap).length > 0) {
           const entries = Object.entries(optionsMap);
-          const weights = entries.map(([_, count]) => Math.pow(count, 1 / temp));
-          const totalWeight = weights.reduce((sum, w) => sum + w, 0);
-
-          let randomVal = Math.random() * totalWeight;
-          let selectedStr = entries[0][0];
-
-          for (let i = 0; i < entries.length; i++) {
-            randomVal -= weights[i];
-            if (randomVal <= 0) {
-              selectedStr = entries[i][0];
-              break;
-            }
-          }
-
+          const selectedStr = entries[Math.floor(Math.random() * entries.length)][0];
           const [p, d, v] = selectedStr.split(':').map(Number);
           const noteObj = { pitch: quantizeToScale(p), duration: d, velocity: v };
-
           currentHistory.push(noteObj);
-          if (currentHistory.length > order * 2) {
-            currentHistory = currentHistory.slice(-order);
-          }
           return noteObj;
         }
       }
 
-      const rawFallback = dataset[Math.floor(Math.random() * dataset.length)];
-      const fallbackNote = { ...rawFallback, pitch: quantizeToScale(rawFallback.pitch) };
+      const fallback = dataset[Math.floor(Math.random() * dataset.length)];
+      const fallbackNote = { ...fallback, pitch: quantizeToScale(fallback.pitch) };
       currentHistory.push(fallbackNote);
       return fallbackNote;
     }
 
-    function playSynthChord(noteObj, bpm) {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
+    // Synthesize Drums via Web Audio API (White noise for snare/hats, Sine sweep for kick)
+    function playDrumSound(pitch, velocity, bpm) {
+      if (!audioCtx || !muteState.drm) return;
+      const now = audioCtx.currentTime;
+      const gain = audioCtx.createGain();
+      gain.connect(audioCtx.destination);
+      const vol = (velocity / 127) * 0.4;
 
+      if (pitch === 36) { // Kick
+        const osc = audioCtx.createOscillator();
+        osc.frequency.setValueAtTime(130, now);
+        osc.frequency.exponentialRampToValueAtTime(35, now + 0.12);
+        gain.gain.setValueAtTime(vol, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        osc.connect(gain);
+        osc.start(now);
+        osc.stop(now + 0.15);
+      } else if (pitch === 38) { // Snare
+        const noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < noiseBuffer.length; i++) output[i] = Math.random() * 2 - 1;
+        const whiteNoise = audioCtx.createBufferSource();
+        whiteNoise.buffer = noiseBuffer;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 1000;
+
+        gain.gain.setValueAtTime(vol, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+        whiteNoise.connect(filter);
+        filter.connect(gain);
+        whiteNoise.start(now);
+      } else { // Hi-Hat (42 or 46)
+        const noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.05, audioCtx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < noiseBuffer.length; i++) output[i] = Math.random() * 2 - 1;
+        const whiteNoise = audioCtx.createBufferSource();
+        whiteNoise.buffer = noiseBuffer;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 7000;
+
+        gain.gain.setValueAtTime(vol * 0.6, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + (pitch === 46 ? 0.15 : 0.04));
+        whiteNoise.connect(filter);
+        filter.connect(gain);
+        whiteNoise.start(now);
+      }
+    }
+
+    function playSynthChord(noteObj, bpm) {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       const presetKey = document.getElementById('preset-select').value;
-      const synthProfile = (PRESET_LIBRARY[presetKey] || PRESET_LIBRARY.baroque).synth;
-      const baseVelocity = Math.max(0.1, noteObj.velocity / 127);
+      const synthProfile = (PRESET_LIBRARY[presetKey] || PRESET_LIBRARY.pop).synth;
       const parts = getSeparatedTrackPitches(noteObj.pitch, noteObj.duration);
 
+      // Play Drum Percussion Trigger for current beat segment
+      const drumMode = document.getElementById('drum-mode-select').value;
+      if (drumMode !== 'off') {
+        const drumPattern = PRESET_LIBRARY[presetKey].drums || [];
+        const currentMeasureBeat = currentBeatCount % 4;
+        drumPattern.forEach(d => {
+          if (Math.abs(d.beat - currentMeasureBeat) < 0.2) {
+            playDrumSound(d.pitch, d.v, bpm);
+          }
+        });
+      }
+
       const allVoices = [
-        ...parts.melody.map(v => ({ ...v, role: 'melody' })),
-        ...parts.chords.map(v => ({ ...v, role: 'chords' })),
-        ...parts.bass.map(v => ({ ...v, role: 'bass' }))
+        ...(muteState.mel ? parts.melody.map(v => ({ ...v, role: 'melody' })) : []),
+        ...(muteState.chd ? parts.chords.map(v => ({ ...v, role: 'chords' })) : []),
+        ...(muteState.bas ? parts.bass.map(v => ({ ...v, role: 'bass' })) : [])
       ];
 
       allVoices.forEach((v) => {
@@ -693,26 +818,14 @@
         const now = audioCtx.currentTime;
         const durSeconds = (60 / bpm) * v.duration;
 
-        if (v.role === 'bass') {
-          osc.type = 'sine';
-          filter.frequency.setValueAtTime(400, now);
-        } else if (v.role === 'chords') {
-          osc.type = 'triangle';
-          filter.frequency.setValueAtTime(1500, now);
-        } else {
-          osc.type = synthProfile.type;
-          filter.frequency.setValueAtTime(synthProfile.filterFreq, now);
-        }
-
+        osc.type = v.role === 'bass' ? 'sine' : v.role === 'chords' ? 'triangle' : synthProfile.type;
         osc.frequency.setValueAtTime(midiToFreq(v.pitch), now);
         filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(v.role === 'bass' ? 400 : synthProfile.filterFreq, now);
 
-        let voiceGain = baseVelocity * 0.25;
-        if (v.role === 'chords') voiceGain *= 0.50;
-        if (v.role === 'bass') voiceGain *= 0.85;
-
+        let voiceGain = (noteObj.velocity / 127) * 0.2;
         gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(voiceGain, now + 0.03);
+        gain.gain.linearRampToValueAtTime(voiceGain, now + 0.02);
         gain.gain.exponentialRampToValueAtTime(0.0001, now + durSeconds);
 
         osc.connect(filter);
@@ -726,79 +839,61 @@
       return (60 / bpm) * noteObj.duration;
     }
 
-    function drawNoteOnPianoRoll(noteObj) {
+    function drawPianoRoll(noteObj) {
       const canvas = document.getElementById('piano-roll');
       const ctx = canvas.getContext('2d');
-      const width = canvas.width;
-      const height = canvas.height;
+      const speedPx = Math.max(16, Math.round(noteObj.duration * 32));
 
-      const speedPx = Math.max(16, Math.min(64, Math.round(noteObj.duration * 32)));
-
-      const imageData = ctx.getImageData(speedPx, 0, width - speedPx, height);
-      ctx.putImageData(imageData, 0, 0);
+      const imgData = ctx.getImageData(speedPx, 0, canvas.width - speedPx, canvas.height);
+      ctx.putImageData(imgData, 0, 0);
 
       ctx.fillStyle = '#0f172a';
-      ctx.fillRect(width - speedPx, 0, speedPx, height);
+      ctx.fillRect(canvas.width - speedPx, 0, speedPx, canvas.height);
 
       const parts = getSeparatedTrackPitches(noteObj.pitch, noteObj.duration);
-
-      const drawPitch = (pitch, color, glow) => {
-        const clampedPitch = Math.max(MIN_MIDI - 12, Math.min(MAX_MIDI + 12, pitch));
-        const normalizedPitch = (clampedPitch - MIN_MIDI) / (MAX_MIDI - MIN_MIDI);
-
-        const blockHeight = 8;
-        const y = height - (normalizedPitch * (height - blockHeight)) - blockHeight;
-
+      const drawBlock = (pitch, color) => {
+        const norm = (pitch - 36) / 48;
+        const y = canvas.height - (norm * canvas.height);
         ctx.fillStyle = color;
-        ctx.shadowColor = glow;
-        ctx.shadowBlur = 6;
-        ctx.fillRect(width - speedPx + 2, y, speedPx - 4, blockHeight);
-        ctx.shadowBlur = 0;
+        ctx.fillRect(canvas.width - speedPx + 2, y, speedPx - 4, 8);
       };
 
-      parts.melody.forEach(v => drawPitch(v.pitch, '#8b5cf6', '#8b5cf6'));
-      parts.chords.forEach(v => drawPitch(v.pitch, 'rgba(16, 185, 129, 0.75)', '#10b981'));
-      parts.bass.forEach(v => drawPitch(v.pitch, 'rgba(239, 68, 68, 0.85)', '#ef4444'));
-    }
-
-    function clearPianoRoll() {
-      const canvas = document.getElementById('piano-roll');
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      if (muteState.mel) parts.melody.forEach(v => drawBlock(v.pitch, '#8b5cf6'));
+      if (muteState.chd) parts.chords.forEach(v => drawBlock(v.pitch, '#10b981'));
+      if (muteState.bas) parts.bass.forEach(v => drawBlock(v.pitch, '#ef4444'));
     }
 
     function step() {
       if (!isPlaying) return;
-
+      const barSetting = document.getElementById('bars-select').value;
       const bpm = parseInt(document.getElementById('tempo-input').value) || 120;
+
+      if (barSetting !== 'infinite' && currentBeatCount >= parseInt(barSetting) * 4) {
+        stopPlayback();
+        logMessage(`Finished performance of ${barSetting} Bar(s).`);
+        return;
+      }
+
       const noteObj = getNextNoteObject();
       generatedHistory.push(noteObj);
+      currentBeatCount += noteObj.duration;
 
       const parts = getSeparatedTrackPitches(noteObj.pitch, noteObj.duration);
-      const melStr = `Melody: ${parts.melody.map(v => midiToName(v.pitch)).join('')}`;
-      const chordStr = parts.chords.length ? ` | Chords: ${parts.chords.map(v => midiToName(v.pitch)).join(', ')}` : '';
-      const bassStr = parts.bass.length ? ` | Bass: ${parts.bass.map(v => midiToName(v.pitch)).join(', ')}` : '';
+      document.getElementById('current-note').textContent = `Lead: ${midiToName(parts.melody[0].pitch)} | Beat: ${currentBeatCount.toFixed(1)}`;
 
-      document.getElementById('current-note').textContent = `${melStr}${chordStr}${bassStr}`;
+      drawPianoRoll(noteObj);
+      const delay = playSynthChord(noteObj, bpm);
 
-      drawNoteOnPianoRoll(noteObj);
-      const stepDurationSeconds = playSynthChord(noteObj, bpm);
-
-      timerId = setTimeout(step, stepDurationSeconds * 1000);
+      timerId = setTimeout(step, delay * 1000);
     }
 
     async function togglePlayback() {
       if (!isPlaying) {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') await audioCtx.resume();
-
         isPlaying = true;
+        currentBeatCount = 0;
         generatedHistory = [];
-        currentHistory = [];
-
-        clearPianoRoll();
-
         const btn = document.getElementById('play-btn');
         btn.textContent = '⏸ Pause Performance';
         btn.style.backgroundColor = 'var(--danger)';
@@ -832,177 +927,127 @@
       return [0x00, 0xFF, metaType, bytes.length, ...bytes];
     }
 
-    // --- ABSOLUTE TIMESTAMP MULTI-TRACK MIDI GENERATOR ---
+    // --- 4-TRACK DAW MIDI EXPORT ENGINE (MELODY, CHORDS, BASS, DRUMS CH 10) ---
     function exportMultiTrackMidi() {
-      const targetCount = 64;
-      let notesToExport = [];
+      const barSetting = document.getElementById('bars-select').value;
+      const targetBars = barSetting === 'infinite' ? 16 : parseInt(barSetting);
+      const ticksPerQuarter = 96;
+      const targetTotalTicks = targetBars * 4 * ticksPerQuarter;
 
-      if (generatedHistory.length >= targetCount) {
-        notesToExport = generatedHistory.slice(0, targetCount);
-      } else {
-        currentHistory = [];
-        notesToExport = [];
-        for (let i = 0; i < targetCount; i++) {
-          notesToExport.push(getNextNoteObject());
+      let notesToExport = [];
+      let accumulatedTicks = 0;
+
+      while (accumulatedTicks < targetTotalTicks) {
+        const note = getNextNoteObject();
+        const noteTicks = Math.round(note.duration * ticksPerQuarter);
+        if (accumulatedTicks + noteTicks > targetTotalTicks) {
+          const remBeats = (targetTotalTicks - accumulatedTicks) / ticksPerQuarter;
+          if (remBeats > 0) notesToExport.push({ ...note, duration: remBeats });
+          break;
         }
+        notesToExport.push(note);
+        accumulatedTicks += noteTicks;
       }
 
       const bpm = parseInt(document.getElementById('tempo-input').value) || 120;
-      const ticksPerQuarter = 96; // Standard PPQ resolution
+      const presetKey = document.getElementById('preset-select').value;
+      const drumPattern = PRESET_LIBRARY[presetKey].drums || [];
 
-      // Calculate total timeline length in ticks
-      let totalSongTicks = 0;
-      notesToExport.forEach(n => {
-        totalSongTicks += Math.round(n.duration * ticksPerQuarter);
-      });
-
-      // FORMAT 1 Header: 4 Tracks total (Conductor + 3 Instrument Tracks)
+      // FORMAT 1 Header: 5 Tracks (Conductor + 3 Melodic Tracks + Drum Percussion Track)
       const header = [
         0x4d, 0x54, 0x68, 0x64, 
         0x00, 0x00, 0x00, 0x06, 
-        0x00, 0x01, // Format 1 (Multi-Track)
-        0x00, 0x04, // 4 Tracks
+        0x00, 0x01, // Format 1
+        0x00, 0x05, // 5 Tracks Total
         (ticksPerQuarter >> 8) & 0xFF, ticksPerQuarter & 0xFF
       ];
 
-      // TRACK 0: Conductor Track (Tempo & Global Time Signature)
+      // Track 0: Conductor (Tempo Map)
       let t0Data = [];
-      const uSecPerQuarter = Math.round(60000000 / bpm);
+      const uSec = Math.round(60000000 / bpm);
       t0Data.push(...createMetaText(0x03, "Tempo Map"));
-      t0Data.push(0x00, 0xFF, 0x51, 0x03, (uSecPerQuarter >> 16) & 0xFF, (uSecPerQuarter >> 8) & 0xFF, uSecPerQuarter & 0xFF);
-      t0Data.push(...writeVLQ(totalSongTicks), 0xFF, 0x2F, 0x00); // End at exact totalSongTicks
+      t0Data.push(0x00, 0xFF, 0x51, 0x03, (uSec >> 16) & 0xFF, (uSec >> 8) & 0xFF, uSec & 0xFF);
+      t0Data.push(...writeVLQ(targetTotalTicks), 0xFF, 0x2F, 0x00);
 
-      // ABSOLUTE EVENT QUEUE ENGINE
-      const buildTrackWithAbsoluteTimeline = (trackName, channel, programNum, roleName) => {
+      const buildMelodicTrack = (trackName, channel, programNum, roleName) => {
+        let events = [{ tick: 0, type: 'programChange', channel: channel, program: programNum }];
+        let timeline = 0;
+
+        notesToExport.forEach(n => {
+          const durTicks = Math.round(n.duration * ticksPerQuarter);
+          const parts = getSeparatedTrackPitches(n.pitch, n.duration);
+          const voices = parts[roleName] || [];
+
+          voices.forEach(v => {
+            events.push({ tick: timeline, type: 'noteOn', channel: channel, pitch: v.pitch, vel: n.velocity });
+            events.push({ tick: timeline + durTicks, type: 'noteOff', channel: channel, pitch: v.pitch });
+          });
+          timeline += durTicks;
+        });
+
+        events.push({ tick: targetTotalTicks, type: 'endOfTrack' });
+        return compileTrackBytes(trackName, events);
+      };
+
+      // TRACK 4: DRUM PERCUSSION TRACK (GM Channel 10 -> Hex Channel 9)
+      const buildDrumTrack = () => {
         let events = [];
+        const ticksPerMeasure = 4 * ticksPerQuarter;
 
-        // 1. Meta Events at Tick 0
-        events.push({ tick: 0, type: 'metaText', metaType: 0x03, text: trackName });
-        events.push({ tick: 0, type: 'metaText', metaType: 0x04, text: trackName });
-        events.push({ tick: 0, type: 'channelPrefix', channel: channel });
-        events.push({ tick: 0, type: 'programChange', channel: channel, program: programNum });
-
-        let currentTimelineTick = 0;
-        let lastChordEndTick = 0;
-
-        notesToExport.forEach((noteObj) => {
-          const stepTicks = Math.round(noteObj.duration * ticksPerQuarter);
-          const parts = getSeparatedTrackPitches(noteObj.pitch, noteObj.duration);
-          const voices = parts[roleName];
-
-          if (voices && voices.length > 0) {
-            // For chords and bass: trigger ONLY when previous sustained chord has finished
-            if (roleName === 'melody' || currentTimelineTick >= lastChordEndTick) {
-              const durTicks = Math.round(voices[0].duration * ticksPerQuarter);
-
-              voices.forEach((v) => {
-                events.push({
-                  tick: currentTimelineTick,
-                  type: 'noteOn',
-                  channel: channel,
-                  pitch: v.pitch,
-                  velocity: noteObj.velocity
-                });
-
-                events.push({
-                  tick: currentTimelineTick + durTicks,
-                  type: 'noteOff',
-                  channel: channel,
-                  pitch: v.pitch,
-                  velocity: 0
-                });
-              });
-
-              lastChordEndTick = currentTimelineTick + durTicks;
+        for (let m = 0; m < targetBars; m++) {
+          const measureStartTick = m * ticksPerMeasure;
+          drumPattern.forEach(d => {
+            const dTick = measureStartTick + Math.round(d.beat * ticksPerQuarter);
+            if (dTick < targetTotalTicks) {
+              events.push({ tick: dTick, type: 'noteOn', channel: 9, pitch: d.pitch, vel: d.v });
+              events.push({ tick: dTick + 12, type: 'noteOff', channel: 9, pitch: d.pitch });
             }
-          }
+          });
+        }
 
-          currentTimelineTick += stepTicks;
-        });
+        events.push({ tick: targetTotalTicks, type: 'endOfTrack' });
+        return compileTrackBytes("Percussion Drums", events);
+      };
 
-        // 2. Add End-Of-Track event at totalSongTicks (padding all tracks to match exactly)
-        events.push({
-          tick: Math.max(currentTimelineTick, lastChordEndTick, totalSongTicks),
-          type: 'endOfTrack'
-        });
-
-        // 3. Sort Events strictly by absolute timestamp (noteOff before noteOn at same tick)
-        events.sort((a, b) => {
-          if (a.tick !== b.tick) return a.tick - b.tick;
-          if (a.type === 'noteOff' && b.type === 'noteOn') return -1;
-          if (a.type === 'noteOn' && b.type === 'noteOff') return 1;
-          return 0;
-        });
-
-        // 4. Convert Absolute Timestamps to Relative Delta-Times
-        let tData = [];
+      function compileTrackBytes(name, events) {
+        events.sort((a, b) => a.tick - b.tick);
+        let tData = [...createMetaText(0x03, name)];
         let lastTick = 0;
 
-        events.forEach((e) => {
-          const delta = e.tick - lastTick;
-          const deltaVLQ = writeVLQ(delta);
-
-          if (e.type === 'metaText') {
-            const bytes = Array.from(e.text).map(c => c.charCodeAt(0));
-            tData.push(...deltaVLQ, 0xFF, e.metaType, bytes.length, ...bytes);
-          } else if (e.type === 'channelPrefix') {
-            tData.push(...deltaVLQ, 0xFF, 0x20, 0x01, e.channel & 0x0F);
-          } else if (e.type === 'programChange') {
-            tData.push(...deltaVLQ, (0xC0 | (e.channel & 0x0F)), e.program & 0x7F);
+        events.forEach(e => {
+          const deltaVLQ = writeVLQ(e.tick - lastTick);
+          if (e.type === 'programChange') {
+            tData.push(...deltaVLQ, 0xC0 | e.channel, e.program & 0x7F);
           } else if (e.type === 'noteOn') {
-            tData.push(...deltaVLQ, (0x90 | (e.channel & 0x0F)), e.pitch & 0x7F, e.velocity & 0x7F);
+            tData.push(...deltaVLQ, 0x90 | e.channel, e.pitch & 0x7F, e.vel & 0x7F);
           } else if (e.type === 'noteOff') {
-            tData.push(...deltaVLQ, (0x80 | (e.channel & 0x0F)), e.pitch & 0x7F, 0x00);
+            tData.push(...deltaVLQ, 0x80 | e.channel, e.pitch & 0x7F, 0x00);
           } else if (e.type === 'endOfTrack') {
             tData.push(...deltaVLQ, 0xFF, 0x2F, 0x00);
           }
-
           lastTick = e.tick;
         });
 
-        const lenBytes = [
-          (tData.length >> 24) & 0xFF,
-          (tData.length >> 16) & 0xFF,
-          (tData.length >> 8) & 0xFF,
-          tData.length & 0xFF
-        ];
+        const len = tData.length;
+        return [0x4d, 0x54, 0x72, 0x6b, (len >> 24) & 0xFF, (len >> 16) & 0xFF, (len >> 8) & 0xFF, len & 0xFF, ...tData];
+      }
 
-        return [0x4d, 0x54, 0x72, 0x6b, ...lenBytes, ...tData];
-      };
+      const t0Len = t0Data.length;
+      const track0 = [0x4d, 0x54, 0x72, 0x6b, (t0Len >> 24) & 0xFF, (t0Len >> 16) & 0xFF, (t0Len >> 8) & 0xFF, t0Len & 0xFF, ...t0Data];
+      const track1 = buildMelodicTrack("Melody Lead", 0, 8, "melody");
+      const track2 = buildMelodicTrack("Sustained Chords", 1, 89, "chords");
+      const track3 = buildMelodicTrack("Sub-Bass Anchor", 2, 33, "bass");
+      const track4 = buildDrumTrack();
 
-      // CONSTRUCT THE 3 INSTRUMENT TRACKS
-      const track1 = buildTrackWithAbsoluteTimeline("Melody Lead", 0, 8, "melody");        // Channel 1: Lead Synth / Celesta
-      const track2 = buildTrackWithAbsoluteTimeline("Sustained Chords", 1, 89, "chords");   // Channel 2: Warm Poly Pad / String Ensemble
-      const track3 = buildTrackWithAbsoluteTimeline("Sub-Bass Anchor", 2, 33, "bass");      // Channel 3: Electric/Synth Bass
-
-      // Encode Track 0 Chunk
-      const t0LenBytes = [
-        (t0Data.length >> 24) & 0xFF,
-        (t0Data.length >> 16) & 0xFF,
-        (t0Data.length >> 8) & 0xFF,
-        t0Data.length & 0xFF
-      ];
-      const track0 = [0x4d, 0x54, 0x72, 0x6b, ...t0LenBytes, ...t0Data];
-
-      // Assemble Format 1 Multi-Track MIDI File
-      const fullMidi = new Uint8Array([
-        ...header,
-        ...track0,
-        ...track1,
-        ...track2,
-        ...track3
-      ]);
-
-      const blob = new Blob([fullMidi], { type: 'audio/midi' });
+      const blob = new Blob([new Uint8Array([...header, ...track0, ...track1, ...track2, ...track3, ...track4])], { type: 'audio/midi' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `markov_sustained_daw_${notesToExport.length}steps.mid`;
+      a.download = `markov_${targetBars}bars_4track_daw.mid`;
       a.click();
 
-      logMessage(`Exported Format-1 Multi-Track MIDI. Tracks: "Melody Lead", "Sustained Chords", "Sub-Bass Anchor" aligned to total tick mark (${totalSongTicks} ticks).`);
+      logMessage(`Exported 5-Track MIDI (1 Conductor + 3 Instruments + GM Ch 10 Drums) aligned to ${targetBars} Bars.`);
     }
 
-    clearPianoRoll();
     updateDatasetBlend();
   </script>
 </body>
