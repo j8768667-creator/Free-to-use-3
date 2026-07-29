@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Markov Chain Melody Companion Ultra</title>
+  <title>Markov Chain Melody Companion Pro + Harmonizer</title>
   <style>
     :root {
       --bg-color: #0f172a;
@@ -201,8 +201,8 @@
 
   <div class="container">
     <header>
-      <h1>Markov Chain Melody Companion Ultra</h1>
-      <p>Rich Style Presets, Expressive Timbre Engine & Blending Control</p>
+      <h1>Markov Chain Melody Companion Pro</h1>
+      <p>Real-Time Auto-Harmonization, Extended Scales & Multi-File Blending</p>
     </header>
 
     <div class="card">
@@ -211,16 +211,16 @@
         <div class="form-group">
           <label for="preset-select">Style Preset Library</label>
           <select id="preset-select" onchange="updateDatasetBlend()">
-            <option value="baroque">1. Baroque Bach Counterpoint (Polyphonic felt)</option>
-            <option value="chopin">2. Romantic Chopin Nocturne (Expressive Rubato)</option>
-            <option value="jazz">3. Jazz Bebop & Blues (Syncopated Swing)</option>
-            <option value="synthwave">4. 80s Synthwave Cyber Arp (Driving 16ths)</option>
-            <option value="funk">5. Funk Slap Bass & Groove (Staccato Accents)</option>
-            <option value="flamenco">6. Spanish Flamenco Phrygian Run (Rapid Triplets)</option>
-            <option value="lofi">7. Lo-Fi Hip Hop Chill (Laidback 7ths)</option>
-            <option value="heroic">8. Cinematic Heroic Brass (Triadic Leaps)</option>
-            <option value="pentatonic">9. East Asian Folk Pentatonic (Spacious)</option>
-            <option value="ambient">10. Lydian Ambient Drone (Floating Holds)</option>
+            <option value="baroque">1. Baroque Bach Counterpoint</option>
+            <option value="chopin">2. Romantic Chopin Nocturne</option>
+            <option value="jazz">3. Jazz Bebop & Blues</option>
+            <option value="synthwave">4. 80s Synthwave Cyber Arp</option>
+            <option value="funk">5. Funk Slap Bass & Groove</option>
+            <option value="flamenco">6. Spanish Flamenco Run</option>
+            <option value="lofi">7. Lo-Fi Hip Hop Chill</option>
+            <option value="heroic">8. Cinematic Heroic Brass</option>
+            <option value="pentatonic">9. Asian Pentatonic Folk</option>
+            <option value="ambient">10. Lydian Ambient Drone</option>
           </select>
         </div>
 
@@ -241,7 +241,7 @@
     </div>
 
     <div class="card">
-      <h3>2. Markov Engine & Groove Dynamics</h3>
+      <h3>2. Markov Engine & Harmonizer Controls</h3>
       <div class="grid">
         <div class="form-group">
           <label for="order-select">Markov Order (N-Gram)</label>
@@ -249,6 +249,40 @@
             <option value="1">Order 1 (High Variation)</option>
             <option value="2" selected>Order 2 (Balanced Phrases)</option>
             <option value="3">Order 3 (Strict Motif Clone)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="chord-select">Auto-Harmonizer / Chords</label>
+          <select id="chord-select">
+            <option value="off">Off (Single Melody Line)</option>
+            <option value="dyad3">Diatonic Dyad (3rd Above)</option>
+            <option value="dyad6">Diatonic Dyad (6th Below)</option>
+            <option value="triad" selected>Diatonic Triad (3-Note Chord)</option>
+            <option value="seventh">7th Chord (4-Note Harmony)</option>
+            <option value="bass">Melody + Sub-Bass Anchor</option>
+            <option value="full">Full Band (Triad + Sub-Bass)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="scale-select">Key / Scale Lock (12 Scales)</label>
+          <select id="scale-select">
+            <option value="chromatic">Off (Raw Pitch Inputs)</option>
+            <option value="major">C Major (Ionian)</option>
+            <option value="minor">A Natural Minor (Aeolian)</option>
+            <option value="harmonic_minor">A Harmonic Minor</option>
+            <option value="melodic_minor">A Melodic Minor</option>
+            <option value="dorian">D Dorian</option>
+            <option value="phrygian">E Phrygian</option>
+            <option value="lydian">F Lydian</option>
+            <option value="mixolydian">G Mixolydian</option>
+            <option value="pentatonic_major">C Pentatonic Major</option>
+            <option value="pentatonic_minor">A Pentatonic Minor</option>
+            <option value="blues">A Blues Scale</option>
+            <option value="hirajoshi">Japanese Hirajoshi</option>
+            <option value="hungarian">Hungarian Minor</option>
+            <option value="whole_tone">Whole Tone Scale</option>
           </select>
         </div>
 
@@ -262,29 +296,10 @@
 
         <div class="form-group">
           <div class="form-group-row">
-            <label for="swing-input">Swing / Humanize Feeling</label>
-            <span class="val-display" id="swing-val">20%</span>
-          </div>
-          <input type="range" id="swing-input" min="0" max="60" step="5" value="20" oninput="document.getElementById('swing-val').textContent = this.value + '%'">
-        </div>
-
-        <div class="form-group">
-          <div class="form-group-row">
             <label for="trans-input">Octave Shift</label>
             <span class="val-display" id="trans-val">0 ST</span>
           </div>
           <input type="range" id="trans-input" min="-24" max="24" step="12" value="0" oninput="document.getElementById('trans-val').textContent = (this.value > 0 ? '+' : '') + this.value + ' ST'">
-        </div>
-
-        <div class="form-group">
-          <label for="scale-select">Key / Scale Lock</label>
-          <select id="scale-select">
-            <option value="chromatic">Off (Raw Preset/File Pitches)</option>
-            <option value="major">C Major</option>
-            <option value="minor">A Minor</option>
-            <option value="dorian">D Dorian</option>
-            <option value="pentatonic">C Pentatonic Major</option>
-          </select>
         </div>
 
         <div class="form-group">
@@ -311,13 +326,13 @@
 
       <div class="form-group">
         <label>Markov Activity Log</label>
-        <div class="log-box" id="log-box">Engine ready with rich preset multi-dimensional datasets.</div>
+        <div class="log-box" id="log-box">Harmonizer engine initialized with 12 scales & dynamic polyphony.</div>
       </div>
     </div>
   </div>
 
   <script>
-    // --- RICH MULTI-DIMENSIONAL PRESETS (Pitch, Duration in beats, Velocity 0-127, Synth Timbre) ---
+    // PRESET LIBRARY
     const PRESET_LIBRARY = {
       baroque: {
         name: "Baroque Bach Counterpoint",
@@ -420,12 +435,23 @@
       return result;
     }
 
+    // --- EXPANDED SCALE LIBRARY ---
     const SCALES = {
       chromatic: null,
       major: [0, 2, 4, 5, 7, 9, 11],
       minor: [0, 2, 3, 5, 7, 8, 10],
+      harmonic_minor: [0, 2, 3, 5, 7, 8, 11],
+      melodic_minor: [0, 2, 3, 5, 7, 9, 11],
       dorian: [0, 2, 3, 5, 7, 9, 10],
-      pentatonic: [0, 2, 4, 7, 9]
+      phrygian: [0, 1, 3, 5, 7, 8, 10],
+      lydian: [0, 2, 4, 6, 7, 9, 11],
+      mixolydian: [0, 2, 4, 5, 7, 9, 10],
+      pentatonic_major: [0, 2, 4, 7, 9],
+      pentatonic_minor: [0, 3, 5, 7, 10],
+      blues: [0, 3, 5, 6, 7, 10],
+      hirajoshi: [0, 2, 3, 7, 8],
+      hungarian: [0, 2, 3, 6, 7, 8, 11],
+      whole_tone: [0, 2, 4, 6, 8, 10]
     };
 
     let uploadedDataset = [];
@@ -478,8 +504,63 @@
       return (octave * 12) + closest;
     }
 
+    // --- DIATONIC HARMONIZER ENGINE ---
+    function getHarmonyPitches(leadPitch) {
+      const mode = document.getElementById('chord-select').value;
+      if (mode === 'off') return [leadPitch];
+
+      const scaleKey = document.getElementById('scale-select').value;
+      const scalePattern = SCALES[scaleKey] || [0, 2, 4, 5, 7, 9, 11]; // Fallback to Major if Chromatic
+
+      const octave = Math.floor(leadPitch / 12);
+      const pitchClass = (leadPitch % 12 + 12) % 12;
+
+      // Find degree index in scale pattern
+      let degreeIdx = scalePattern.indexOf(pitchClass);
+      if (degreeIdx === -1) {
+        // Quantize pitch class if not exact match
+        degreeIdx = 0;
+      }
+
+      const getDegreePitch = (scaleOffset) => {
+        const targetIdx = (degreeIdx + scaleOffset) % scalePattern.length;
+        const octaveOffset = Math.floor((degreeIdx + scaleOffset) / scalePattern.length);
+        return ((octave + octaveOffset) * 12) + scalePattern[targetIdx];
+      };
+
+      let chordPitches = [leadPitch];
+
+      switch (mode) {
+        case 'dyad3':
+          chordPitches.push(getDegreePitch(2)); // 3rd above
+          break;
+        case 'dyad6':
+          chordPitches.push(getDegreePitch(5) - 12); // 6th below
+          break;
+        case 'triad':
+          chordPitches.push(getDegreePitch(2)); // 3rd
+          chordPitches.push(getDegreePitch(4)); // 5th
+          break;
+        case 'seventh':
+          chordPitches.push(getDegreePitch(2)); // 3rd
+          chordPitches.push(getDegreePitch(4)); // 5th
+          chordPitches.push(getDegreePitch(6)); // 7th
+          break;
+        case 'bass':
+          chordPitches.push(getDegreePitch(0) - 24); // Root Sub-Bass 2 octaves down
+          break;
+        case 'full':
+          chordPitches.push(getDegreePitch(2)); // 3rd
+          chordPitches.push(getDegreePitch(4)); // 5th
+          chordPitches.push(getDegreePitch(0) - 24); // Root Sub-Bass
+          break;
+      }
+
+      return chordPitches;
+    }
+
     function updateDatasetBlend() {
-      const blendWeight = parseFloat(document.getElementById('blend-slider').value); // 0.0 (upload) to 1.0 (preset)
+      const blendWeight = parseFloat(document.getElementById('blend-slider').value);
       const presetKey = document.getElementById('preset-select').value;
       const presetObj = PRESET_LIBRARY[presetKey] || PRESET_LIBRARY.baroque;
 
@@ -578,8 +659,8 @@
       return fallbackNote;
     }
 
-    // --- SYNTHESIZER ENGINE WITH PRESET TIMBRE PROFILES ---
-    function playSynthNote(noteObj, bpm) {
+    // --- POLYPHONIC SYNTH ENGINE ---
+    function playSynthChord(noteObj, bpm) {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
@@ -588,29 +669,41 @@
       const synthProfile = (PRESET_LIBRARY[presetKey] || PRESET_LIBRARY.baroque).synth;
 
       const durationSeconds = (60 / bpm) * noteObj.duration;
-      const velocityGain = Math.max(0.1, noteObj.velocity / 127);
+      const baseVelocity = Math.max(0.1, noteObj.velocity / 127);
+      const chordPitches = getHarmonyPitches(noteObj.pitch);
 
-      const osc = audioCtx.createOscillator();
-      const filter = audioCtx.createBiquadFilter();
-      const gain = audioCtx.createGain();
-      const now = audioCtx.currentTime;
+      chordPitches.forEach((pitch, i) => {
+        const osc = audioCtx.createOscillator();
+        const filter = audioCtx.createBiquadFilter();
+        const gain = audioCtx.createGain();
+        const now = audioCtx.currentTime;
 
-      osc.type = synthProfile.type;
-      osc.frequency.setValueAtTime(midiToFreq(noteObj.pitch), now);
+        // Bass voice gets sine wave for clean low end
+        if (pitch < 48) {
+          osc.type = 'sine';
+          filter.frequency.setValueAtTime(800, now);
+        } else {
+          osc.type = synthProfile.type;
+          filter.frequency.setValueAtTime(synthProfile.filterFreq, now);
+        }
 
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(synthProfile.filterFreq, now);
+        osc.frequency.setValueAtTime(midiToFreq(pitch), now);
+        filter.type = 'lowpass';
 
-      gain.gain.setValueAtTime(0, now);
-      gain.gain.linearRampToValueAtTime(0.3 * velocityGain, now + synthProfile.attack);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSeconds);
+        // Harmony notes are slightly quieter than lead note
+        const voiceGain = i === 0 ? baseVelocity * 0.3 : baseVelocity * 0.18;
 
-      osc.connect(filter);
-      filter.connect(gain);
-      gain.connect(audioCtx.destination);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(voiceGain, now + synthProfile.attack);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSeconds);
 
-      osc.start(now);
-      osc.stop(now + durationSeconds);
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + durationSeconds);
+      });
 
       return durationSeconds;
     }
@@ -629,19 +722,22 @@
       ctx.fillStyle = '#0f172a';
       ctx.fillRect(width - speedPx, 0, speedPx, height);
 
-      const clampedPitch = Math.max(MIN_MIDI, Math.min(MAX_MIDI, noteObj.pitch));
-      const normalizedPitch = (clampedPitch - MIN_MIDI) / (MAX_MIDI - MIN_MIDI);
+      const chordPitches = getHarmonyPitches(noteObj.pitch);
 
-      const blockHeight = 10;
-      const y = height - (normalizedPitch * (height - blockHeight)) - blockHeight;
-      const alpha = Math.max(0.4, noteObj.velocity / 127);
+      chordPitches.forEach((pitch, i) => {
+        const clampedPitch = Math.max(MIN_MIDI - 12, Math.min(MAX_MIDI + 12, pitch));
+        const normalizedPitch = (clampedPitch - MIN_MIDI) / (MAX_MIDI - MIN_MIDI);
 
-      ctx.fillStyle = `rgba(139, 92, 246, ${alpha})`;
-      ctx.shadowColor = '#8b5cf6';
-      ctx.shadowBlur = 8;
+        const blockHeight = 8;
+        const y = height - (normalizedPitch * (height - blockHeight)) - blockHeight;
 
-      ctx.fillRect(width - speedPx + 2, y, speedPx - 4, blockHeight);
-      ctx.shadowBlur = 0;
+        ctx.fillStyle = i === 0 ? '#8b5cf6' : 'rgba(16, 185, 129, 0.7)';
+        ctx.shadowColor = i === 0 ? '#8b5cf6' : '#10b981';
+        ctx.shadowBlur = 6;
+
+        ctx.fillRect(width - speedPx + 2, y, speedPx - 4, blockHeight);
+        ctx.shadowBlur = 0;
+      });
     }
 
     function clearPianoRoll() {
@@ -655,22 +751,17 @@
       if (!isPlaying) return;
 
       const bpm = parseInt(document.getElementById('tempo-input').value) || 120;
-      const swingAmount = parseInt(document.getElementById('swing-input').value) || 0;
-
       const noteObj = getNextNoteObject();
       generatedHistory.push(noteObj);
       currentNoteCount++;
 
-      document.getElementById('current-note').textContent = 
-        `${midiToName(noteObj.pitch)} | Dur: ${noteObj.duration}b | Vel: ${noteObj.velocity}`;
+      const chordPitches = getHarmonyPitches(noteObj.pitch);
+      const chordNames = chordPitches.map(p => midiToName(p)).join(', ');
+
+      document.getElementById('current-note').textContent = `${chordNames} | Dur: ${noteObj.duration}b`;
 
       drawNoteOnPianoRoll(noteObj);
-      let durationSeconds = playSynthNote(noteObj, bpm);
-
-      // Apply Swing feeling to alternate 16th notes
-      if (currentNoteCount % 2 === 1 && swingAmount > 0) {
-        durationSeconds *= (1 + (swingAmount / 100));
-      }
+      const durationSeconds = playSynthChord(noteObj, bpm);
 
       timerId = setTimeout(step, durationSeconds * 1000);
     }
@@ -704,7 +795,7 @@
       btn.style.backgroundColor = 'var(--accent)';
     }
 
-    // --- MIDI PARSING ---
+    // --- MIDI PARSER ---
     document.getElementById('midi-file').addEventListener('change', async function(e) {
       const files = Array.from(e.target.files);
       if (!files.length) return;
@@ -728,7 +819,7 @@
 
       if (combinedNotes.length > 0) {
         uploadedDataset = combinedNotes;
-        document.getElementById('blend-slider').value = 0.5; // Auto adjust blend to 50/50 when files uploaded
+        document.getElementById('blend-slider').value = 0.5;
         updateDatasetBlend();
         logMessage(`Parsed ${parsedCount} MIDI file(s) into ${uploadedDataset.length} Note Objects.`);
       }
@@ -847,8 +938,17 @@
 
       notesToExport.forEach(noteObj => {
         const noteTicks = Math.round(noteObj.duration * ticksPerQuarter);
-        trackData.push(0x00, 0x90, noteObj.pitch, noteObj.velocity);
-        trackData.push(...writeVLQ(noteTicks), 0x80, noteObj.pitch, 0x00);
+        const chordPitches = getHarmonyPitches(noteObj.pitch);
+
+        // Export all chord voices polyphonically
+        chordPitches.forEach(pitch => {
+          trackData.push(0x00, 0x90, pitch, noteObj.velocity);
+        });
+
+        chordPitches.forEach((pitch, idx) => {
+          const delta = idx === 0 ? noteTicks : 0;
+          trackData.push(...writeVLQ(delta), 0x80, pitch, 0x00);
+        });
       });
 
       trackData.push(0x00, 0xFF, 0x2F, 0x00);
@@ -862,9 +962,9 @@
       const blob = new Blob([new Uint8Array([...header, ...trackHeader, ...trackLenBytes, ...trackData])], { type: 'audio/midi' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `markov_ultra_sequence_${notesToExport.length}notes.mid`;
+      a.download = `markov_harmonized_sequence_${notesToExport.length}notes.mid`;
       a.click();
-      logMessage(`Exported ${notesToExport.length}-note MIDI file.`);
+      logMessage(`Exported ${notesToExport.length}-step polyphonic chord MIDI file.`);
     }
 
     clearPianoRoll();
