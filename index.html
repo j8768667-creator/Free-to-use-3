@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Markov Chain Melody Companion</title>
+  <title>Markov Chain Melody Companion Pro</title>
   <style>
     :root {
       --bg-color: #0f172a;
@@ -14,6 +14,7 @@
       --text-muted: #94a3b8;
       --border-color: #334155;
       --success: #10b981;
+      --danger: #ef4444;
     }
 
     * {
@@ -143,7 +144,7 @@
     }
 
     .visualizer-box {
-      height: 100px;
+      height: 80px;
       background-color: var(--bg-color);
       border: 1px solid var(--border-color);
       border-radius: 6px;
@@ -154,6 +155,15 @@
       font-weight: bold;
       color: var(--accent);
       letter-spacing: 0.1em;
+    }
+
+    canvas {
+      width: 100%;
+      height: 160px;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      display: block;
     }
 
     .log-box {
@@ -173,8 +183,8 @@
 
   <div class="container">
     <header>
-      <h1>Markov Chain Melody Companion</h1>
-      <p>Multi-File Probabilistic Sequence Synthesizer</p>
+      <h1>Markov Chain Melody Companion Pro</h1>
+      <p>Poly-Rhythmic & Expressive Probabilistic Sequence Synthesizer</p>
     </header>
 
     <div class="card">
@@ -185,14 +195,14 @@
           <input type="file" id="midi-file" accept=".mid,.midi" multiple>
         </div>
         <div class="form-group">
-          <label for="preset-select">Or Load Built-In Style Presets</label>
+          <label for="preset-select">Or Load Built-In Rhythmic Presets</label>
           <select id="preset-select" onchange="loadPreset()">
-            <option value="baroque">Baroque Bach Counterpoint (48 Notes)</option>
-            <option value="jazz">Jazz Blues Scale Riff (36 Notes)</option>
-            <option value="pentatonic">Asian Pentatonic Folk (32 Notes)</option>
-            <option value="chopin">Romantic Chopin Nocturne (42 Notes)</option>
-            <option value="synthwave">Synthwave Arpeggios (32 Notes)</option>
-            <option value="ambient">Lydian Ambient Float (36 Notes)</option>
+            <option value="baroque">Baroque Bach Counterpoint</option>
+            <option value="jazz">Jazz Blues Scale Riff</option>
+            <option value="pentatonic">Asian Pentatonic Folk</option>
+            <option value="chopin">Romantic Chopin Nocturne</option>
+            <option value="synthwave">Synthwave Arpeggios</option>
+            <option value="ambient">Lydian Ambient Float</option>
           </select>
         </div>
       </div>
@@ -213,16 +223,16 @@
 
         <div class="form-group">
           <label for="tempo-input">Tempo (BPM)</label>
-          <input type="number" id="tempo-input" value="130" min="60" max="220">
+          <input type="number" id="tempo-input" value="130" min="40" max="240">
         </div>
 
         <div class="form-group">
           <label for="length-select">Generation Duration / Note Count</label>
           <select id="length-select">
-            <option value="16">16 Notes (4 Bars @ 4/4)</option>
-            <option value="32" selected>32 Notes (8 Bars @ 4/4)</option>
-            <option value="64">64 Notes (16 Bars @ 4/4)</option>
-            <option value="128">128 Notes (32 Bars @ 4/4)</option>
+            <option value="16">16 Notes (Short Motif)</option>
+            <option value="32" selected>32 Notes (Standard Phrase)</option>
+            <option value="64">64 Notes (Extended Section)</option>
+            <option value="128">128 Notes (Full Theme)</option>
             <option value="infinite">Infinite Loop Playback</option>
           </select>
         </div>
@@ -230,9 +240,14 @@
     </div>
 
     <div class="card">
-      <h3>3. Real-Time Playback & Export</h3>
+      <h3>3. Real-Time Visualizer & Playback</h3>
       
       <div class="visualizer-box" id="current-note">--</div>
+
+      <div class="form-group">
+        <label>Piano Roll Visualizer</label>
+        <canvas id="piano-roll" width="800" height="160"></canvas>
+      </div>
 
       <div class="btn-group">
         <button class="btn" id="play-btn" style="flex: 2;" onclick="togglePlayback()">▶ Play Stream</button>
@@ -241,20 +256,28 @@
 
       <div class="form-group">
         <label>Markov Transition Matrix Log</label>
-        <div class="log-box" id="log-box">Engine initialized. Running status parser active.</div>
+        <div class="log-box" id="log-box">Engine initialized with Rhythmic Note Objects.</div>
       </div>
     </div>
   </div>
 
   <script>
-    // Expanded Datasets
+    // Helper to format pitches into structured Note Objects { pitch, duration (beats), velocity (0-127) }
+    function buildRhythmicPreset(pitches, durPattern = [0.25, 0.25, 0.5, 0.25], velPattern = [90, 75, 105, 80]) {
+      return pitches.map((p, i) => ({
+        pitch: p,
+        duration: durPattern[i % durPattern.length],
+        velocity: velPattern[i % velPattern.length]
+      }));
+    }
+
     const PRESETS = {
-      baroque: [60, 62, 64, 65, 67, 65, 64, 62, 60, 67, 69, 71, 72, 71, 69, 67, 65, 64, 62, 60, 64, 67, 72, 60, 62, 64, 65, 67, 65, 64, 62, 60, 67, 69, 71, 72, 71, 69, 67, 65, 64, 62, 60, 64, 67, 72, 60, 64],
-      jazz: [60, 63, 65, 66, 67, 70, 72, 70, 67, 66, 65, 63, 60, 58, 60, 63, 65, 67, 70, 72, 60, 63, 65, 66, 67, 70, 72, 70, 67, 66, 65, 63, 60, 58, 60, 63],
-      pentatonic: [60, 62, 65, 67, 69, 72, 69, 67, 65, 62, 60, 65, 67, 72, 69, 65, 62, 60, 60, 62, 65, 67, 69, 72, 69, 67, 65, 62, 60, 65, 67, 72],
-      chopin: [60, 63, 67, 70, 72, 75, 74, 72, 70, 67, 63, 60, 58, 62, 65, 68, 70, 74, 72, 70, 67, 60, 63, 67, 70, 72, 75, 74, 72, 70, 67, 63, 60, 58, 62, 65, 68, 70, 74, 72, 70, 67],
-      synthwave: [48, 60, 48, 63, 48, 65, 48, 67, 48, 65, 48, 63, 48, 60, 48, 58, 48, 60, 48, 63, 48, 65, 48, 67, 48, 65, 48, 63, 48, 60, 48, 58],
-      ambient: [60, 62, 66, 67, 71, 72, 71, 67, 66, 62, 60, 64, 66, 71, 74, 72, 67, 66, 60, 62, 66, 67, 71, 72, 71, 67, 66, 62, 60, 64, 66, 71, 74, 72, 67, 66]
+      baroque: buildRhythmicPreset([60, 62, 64, 65, 67, 65, 64, 62, 60, 67, 69, 71, 72, 71, 69, 67, 65, 64, 62, 60, 64, 67, 72, 60], [0.25, 0.25, 0.25, 0.25, 0.5, 0.25, 0.25, 0.5], [95, 80, 85, 80, 110, 75, 85, 90]),
+      jazz: buildRhythmicPreset([60, 63, 65, 66, 67, 70, 72, 70, 67, 66, 65, 63, 60, 58, 60, 63, 65, 67, 70, 72], [0.33, 0.17, 0.33, 0.17, 0.5, 0.25, 0.25, 0.5], [100, 70, 95, 65, 110, 80, 85, 100]),
+      pentatonic: buildRhythmicPreset([60, 62, 65, 67, 69, 72, 69, 67, 65, 62, 60, 65, 67, 72, 69, 65, 62, 60], [0.5, 0.25, 0.25, 0.5, 0.5, 1.0], [90, 80, 85, 95, 85, 105]),
+      chopin: buildRhythmicPreset([60, 63, 67, 70, 72, 75, 74, 72, 70, 67, 63, 60, 58, 62, 65, 68, 70, 74, 72], [0.75, 0.25, 0.5, 0.5, 0.25, 0.25, 0.5, 1.0], [85, 65, 90, 80, 70, 75, 95, 100]),
+      synthwave: buildRhythmicPreset([48, 60, 48, 63, 48, 65, 48, 67, 48, 65, 48, 63, 48, 60, 48, 58], [0.25, 0.25, 0.25, 0.25], [110, 85, 100, 85]),
+      ambient: buildRhythmicPreset([60, 62, 66, 67, 71, 72, 71, 67, 66, 62, 60, 64, 66, 71, 74, 72], [1.0, 0.5, 0.5, 1.0, 1.5, 0.5], [70, 65, 75, 80, 70, 85])
     };
 
     let dataset = [...PRESETS.baroque];
@@ -267,6 +290,8 @@
     let currentNoteCount = 0;
 
     const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    const MIN_MIDI = 36;
+    const MAX_MIDI = 84;
 
     function midiToName(midi) {
       const name = NOTE_NAMES[midi % 12];
@@ -278,11 +303,15 @@
       return 440 * Math.pow(2, (midi - 69) / 12);
     }
 
+    function getNoteStateKey(noteArray) {
+      return noteArray.map(n => `${n.pitch}:${n.duration}:${n.velocity}`).join('|');
+    }
+
     function loadPreset() {
       const val = document.getElementById('preset-select').value;
       dataset = [...PRESETS[val]];
       const badge = document.getElementById('dataset-status');
-      badge.textContent = `Dataset Loaded: ${dataset.length} Notes (Preset)`;
+      badge.textContent = `Dataset Loaded: ${dataset.length} Note Objects (Preset)`;
       badge.classList.remove('active');
       buildMatrix();
     }
@@ -292,16 +321,17 @@
       transitionMatrix = {};
 
       for (let i = 0; i < dataset.length - order; i++) {
-        const stateKey = dataset.slice(i, i + order).join(',');
-        const nextNote = dataset[i + order];
+        const slice = dataset.slice(i, i + order);
+        const stateKey = getNoteStateKey(slice);
+        const nextNoteObj = dataset[i + order];
 
         if (!transitionMatrix[stateKey]) {
           transitionMatrix[stateKey] = [];
         }
-        transitionMatrix[stateKey].push(nextNote);
+        transitionMatrix[stateKey].push(nextNoteObj);
       }
 
-      logMessage(`Matrix rebuilt. Order: ${order}, Total States: ${Object.keys(transitionMatrix).length}, Dataset Notes: ${dataset.length}`);
+      logMessage(`Matrix rebuilt. Order: ${order}, Total States: ${Object.keys(transitionMatrix).length}, Dataset Size: ${dataset.length}`);
     }
 
     function logMessage(msg) {
@@ -310,89 +340,159 @@
       logBox.scrollTop = logBox.scrollHeight;
     }
 
-    function getNextNote() {
+    function getNextNoteObject() {
       const order = parseInt(document.getElementById('order-select').value);
       
       if (currentHistory.length < order) {
         currentHistory = dataset.slice(0, order);
       }
 
-      const stateKey = currentHistory.slice(-order).join(',');
-      let options = transitionMatrix[stateKey];
-
-      // Robust fallback if Markov reaches a dead end
-      if (!options || options.length === 0) {
-        const keys = Object.keys(transitionMatrix);
-        const randomKey = keys[Math.floor(Math.random() * keys.length)];
-        options = transitionMatrix[randomKey];
-        const keyNotes = randomKey.split(',').map(Number);
-        currentHistory = [...keyNotes];
+      // Backoff Strategy: try requested order down to order 1
+      for (let currentOrder = order; currentOrder >= 1; currentOrder--) {
+        const stateKey = getNoteStateKey(currentHistory.slice(-currentOrder));
+        if (transitionMatrix[stateKey] && transitionMatrix[stateKey].length > 0) {
+          const options = transitionMatrix[stateKey];
+          const chosenObj = options[Math.floor(Math.random() * options.length)];
+          currentHistory.push(chosenObj);
+          if (currentHistory.length > order * 2) {
+            currentHistory = currentHistory.slice(-order);
+          }
+          return chosenObj;
+        }
       }
 
-      const chosenNote = options[Math.floor(Math.random() * options.length)];
-      currentHistory.push(chosenNote);
-      if (currentHistory.length > order * 2) {
-        currentHistory = currentHistory.slice(-order);
-      }
-      return chosenNote;
+      // Final Fallback: Random note object from full dataset
+      const fallbackObj = dataset[Math.floor(Math.random() * dataset.length)];
+      currentHistory.push(fallbackObj);
+      return fallbackObj;
     }
 
-    function playSynthNote(midiNote, duration) {
+    // --- SYNTHESIZER ENGINE ---
+    function playSynthNote(noteObj, bpm) {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
 
+      const durationSeconds = (60 / bpm) * noteObj.duration;
+      const velocityGain = Math.max(0.1, noteObj.velocity / 127);
+
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
+      const now = audioCtx.currentTime;
 
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(midiToFreq(midiNote), audioCtx.currentTime);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(midiToFreq(noteObj.pitch), now);
 
-      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration * 0.95);
+      // Dynamic Envelope
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.25 * velocityGain, now + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSeconds);
 
       osc.connect(gain);
       gain.connect(audioCtx.destination);
 
-      osc.start();
-      osc.stop(audioCtx.currentTime + duration);
+      osc.start(now);
+      osc.stop(now + durationSeconds);
+
+      return durationSeconds;
     }
 
+    // --- PIANO ROLL CANVAS RENDERING ---
+    function drawNoteOnPianoRoll(noteObj) {
+      const canvas = document.getElementById('piano-roll');
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+
+      const speedPx = Math.max(16, Math.min(64, Math.round(noteObj.duration * 32)));
+
+      // Shift canvas contents left
+      const imageData = ctx.getImageData(speedPx, 0, width - speedPx, height);
+      ctx.putImageData(imageData, 0, 0);
+
+      // Clear rightmost strip
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(width - speedPx, 0, speedPx, height);
+
+      // Grid lines
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < height; i += 20) {
+        ctx.beginPath();
+        ctx.moveTo(width - speedPx, i);
+        ctx.lineTo(width, i);
+        ctx.stroke();
+      }
+
+      // Draw active note block
+      const clampedPitch = Math.max(MIN_MIDI, Math.min(MAX_MIDI, noteObj.pitch));
+      const normalizedPitch = (clampedPitch - MIN_MIDI) / (MAX_MIDI - MIN_MIDI);
+      
+      const blockHeight = 10;
+      const y = height - (normalizedPitch * (height - blockHeight)) - blockHeight;
+
+      const alpha = Math.max(0.4, noteObj.velocity / 127);
+      
+      ctx.fillStyle = `rgba(139, 92, 246, ${alpha})`;
+      ctx.shadowColor = '#8b5cf6';
+      ctx.shadowBlur = 8;
+      
+      ctx.fillRect(width - speedPx + 2, y, speedPx - 4, blockHeight);
+      ctx.shadowBlur = 0;
+    }
+
+    function clearPianoRoll() {
+      const canvas = document.getElementById('piano-roll');
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // --- STEP DRIVER ---
     function step() {
       if (!isPlaying) return;
 
-      const targetLengthVal = document.getElementById('length-select').value;
       const bpm = parseInt(document.getElementById('tempo-input').value) || 120;
-      const duration = 60 / bpm;
+      const targetLengthVal = document.getElementById('length-select').value;
 
-      if (targetLengthVal !== 'infinite') {
-        const maxNotes = parseInt(targetLengthVal);
-        if (currentNoteCount >= maxNotes) {
-          stopPlayback();
-          logMessage(`Completed playback sequence of ${maxNotes} notes.`);
-          return;
-        }
+      if (targetLengthVal !== 'infinite' && currentNoteCount >= parseInt(targetLengthVal)) {
+        stopPlayback();
+        logMessage(`Completed playback sequence of ${targetLengthVal} notes.`);
+        return;
       }
 
-      const nextNote = getNextNote();
-      generatedHistory.push(nextNote);
+      const noteObj = getNextNoteObject();
+      generatedHistory.push(noteObj);
       currentNoteCount++;
 
-      document.getElementById('current-note').textContent = midiToName(nextNote);
-      playSynthNote(nextNote, duration);
+      document.getElementById('current-note').textContent = 
+        `${midiToName(noteObj.pitch)} | Dur: ${noteObj.duration}b | Vel: ${noteObj.velocity}`;
 
-      timerId = setTimeout(step, duration * 1000);
+      drawNoteOnPianoRoll(noteObj);
+      const durationSeconds = playSynthNote(noteObj, bpm);
+
+      timerId = setTimeout(step, durationSeconds * 1000);
     }
 
-    function togglePlayback() {
+    async function togglePlayback() {
       if (!isPlaying) {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          await audioCtx.resume();
+        }
+
         isPlaying = true;
         currentNoteCount = 0;
         generatedHistory = [];
         currentHistory = [];
+        
+        clearPianoRoll();
+        
         const btn = document.getElementById('play-btn');
         btn.textContent = '⏸ Pause Stream';
-        btn.style.backgroundColor = '#ef4444';
+        btn.style.backgroundColor = 'var(--danger)';
         step();
       } else {
         stopPlayback();
@@ -407,7 +507,7 @@
       btn.style.backgroundColor = 'var(--accent)';
     }
 
-    // MULTI-FILE MIDI PARSER WITH RUNNING STATUS SUPPORT
+    // --- MULTI-FILE MIDI IMPORT ---
     document.getElementById('midi-file').addEventListener('change', async function(e) {
       const files = Array.from(e.target.files);
       if (!files.length) return;
@@ -432,39 +532,35 @@
       if (combinedNotes.length > 0) {
         dataset = combinedNotes;
         const badge = document.getElementById('dataset-status');
-        badge.textContent = `Dataset Loaded: ${dataset.length} Notes (${parsedCount} Files)`;
+        badge.textContent = `Dataset Loaded: ${dataset.length} Note Objects (${parsedCount} Files)`;
         badge.classList.add('active');
         buildMatrix();
-        logMessage(`Parsed ${parsedCount} MIDI file(s) into ${dataset.length} total note transitions.`);
+        logMessage(`Parsed ${parsedCount} MIDI file(s) into ${dataset.length} full Note Objects.`);
       } else {
         alert('Could not extract note events. Ensure files are valid .mid formats.');
       }
     });
 
-    // MIDI Parser supporting Running Status & Variable-Length Delays
     function parseFullMidiStream(bytes) {
       const notes = [];
       let p = 0;
 
-      // Skip MThd header chunk if present
       if (bytes[0] === 0x4d && bytes[1] === 0x54 && bytes[2] === 0x68 && bytes[3] === 0x64) {
         const headerLen = (bytes[4] << 24) | (bytes[5] << 16) | (bytes[6] << 8) | bytes[7];
         p = 8 + headerLen;
       }
 
       let runningStatus = 0;
+      let activeNotesMap = {};
 
       while (p < bytes.length) {
-        // Track chunk check (MTrk)
         if (bytes[p] === 0x4d && bytes[p+1] === 0x54 && bytes[p+2] === 0x72 && bytes[p+3] === 0x6b) {
-          p += 8; // skip MTrk header + 4 byte track length
+          p += 8;
           runningStatus = 0;
           continue;
         }
 
-        // Parse variable-length quantity (delta-time)
-        let delta = 0;
-        let b = 0;
+        let delta = 0, b = 0;
         do {
           if (p >= bytes.length) break;
           b = bytes[p++];
@@ -478,16 +574,14 @@
           runningStatus = status;
           p++;
         } else {
-          status = runningStatus; // Running status applied!
+          status = runningStatus;
         }
 
         if (status === 0) continue;
-
         const msgType = status & 0xF0;
 
-        // Meta Events (0xFF) or System Exclusive (0xF0 / 0xF7)
         if (status === 0xFF) {
-          p++; // meta type
+          p++;
           let len = 0, metaByte = 0;
           do {
             if (p >= bytes.length) break;
@@ -503,21 +597,15 @@
             len = (len << 7) | (sysexByte & 0x7f);
           } while (sysexByte & 0x80);
           p += len;
-        } 
-        // Note On Event
-        else if (msgType === 0x90) {
+        } else if (msgType === 0x90) {
           const key = bytes[p++];
           const vel = bytes[p++];
           if (vel > 0 && key >= 21 && key <= 108) {
-            notes.push(key);
+            notes.push({ pitch: key, duration: 0.25, velocity: vel });
           }
-        } 
-        // Note Off or 2-byte messages
-        else if (msgType === 0x80 || msgType === 0xA0 || msgType === 0xB0 || msgType === 0xE0) {
+        } else if (msgType === 0x80 || msgType === 0xA0 || msgType === 0xB0 || msgType === 0xE0) {
           p += 2;
-        } 
-        // 1-byte messages
-        else if (msgType === 0xC0 || msgType === 0xD0) {
+        } else if (msgType === 0xC0 || msgType === 0xD0) {
           p += 1;
         }
       }
@@ -525,26 +613,38 @@
       return notes;
     }
 
-    // Export generated sequence based on selected length
+    // Helper to write Variable Length Quantity for MIDI file creation
+    function writeVLQ(val) {
+      let buffer = [];
+      let v = val;
+      buffer.push(v & 0x7F);
+      while (v >> 7) {
+        v >>= 7;
+        buffer.unshift((v & 0x7F) | 0x80);
+      }
+      return buffer;
+    }
+
+    // --- EXPORT FUNCTIONALITY ---
     function exportMidi() {
       const targetLengthVal = document.getElementById('length-select').value;
       const targetCount = targetLengthVal === 'infinite' ? 64 : parseInt(targetLengthVal);
       
       let notesToExport = [];
-
       if (generatedHistory.length >= targetCount) {
         notesToExport = generatedHistory.slice(0, targetCount);
       } else {
-        // Generate complete batch to match requested length exactly
         currentHistory = [];
         notesToExport = [];
         for (let i = 0; i < targetCount; i++) {
-          notesToExport.push(getNextNote());
+          notesToExport.push(getNextNoteObject());
         }
       }
 
       const bpm = parseInt(document.getElementById('tempo-input').value) || 120;
-      const header = [0x4d, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x01, 0x00, 0x60];
+      const ticksPerQuarter = 96;
+      
+      const header = [0x4d, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x01, 0x00, ticksPerQuarter];
       const trackHeader = [0x4d, 0x54, 0x72, 0x6b];
       let trackData = [];
       
@@ -555,9 +655,14 @@
         microsecondsPerQuarter & 0xFF
       );
 
-      notesToExport.forEach(note => {
-        trackData.push(0x00, 0x90, note, 0x5A); // Note On
-        trackData.push(0x60, 0x80, note, 0x00); // Note Off quarter note duration
+      notesToExport.forEach(noteObj => {
+        const noteTicks = Math.round(noteObj.duration * ticksPerQuarter);
+        
+        // Note On (Delta-time 0)
+        trackData.push(0x00, 0x90, noteObj.pitch, noteObj.velocity);
+        
+        // Note Off after noteTicks duration
+        trackData.push(...writeVLQ(noteTicks), 0x80, noteObj.pitch, 0x00);
       });
 
       trackData.push(0x00, 0xFF, 0x2F, 0x00);
@@ -571,11 +676,13 @@
       const blob = new Blob([new Uint8Array([...header, ...trackHeader, ...trackLenBytes, ...trackData])], { type: 'audio/midi' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `markov_sequence_${notesToExport.length}notes.mid`;
+      a.download = `markov_rhythmic_sequence_${notesToExport.length}notes.mid`;
       a.click();
-      logMessage(`Exported ${notesToExport.length}-note MIDI file.`);
+      logMessage(`Exported ${notesToExport.length}-note expressive MIDI file.`);
     }
 
+    // Initialize Canvas & Matrix on startup
+    clearPianoRoll();
     buildMatrix();
   </script>
 </body>
