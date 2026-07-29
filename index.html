@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Markov Chain Melody Companion Pro</title>
+  <title>Markov Chain Melody Companion Ultra</title>
   <style>
     :root {
       --bg-color: #0f172a;
@@ -35,7 +35,7 @@
 
     .container {
       width: 100%;
-      max-width: 950px;
+      max-width: 1000px;
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
@@ -84,7 +84,7 @@
     }
 
     label {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 600;
       color: var(--text-muted);
       text-transform: uppercase;
@@ -169,7 +169,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: bold;
       color: var(--accent);
       letter-spacing: 0.05em;
@@ -201,48 +201,54 @@
 
   <div class="container">
     <header>
-      <h1>Markov Chain Melody Companion Pro</h1>
-      <p>Expressive Probabilistic Generator with Controlled Source Influence</p>
+      <h1>Markov Chain Melody Companion Ultra</h1>
+      <p>Rich Style Presets, Expressive Timbre Engine & Blending Control</p>
     </header>
 
     <div class="card">
-      <h3>1. Dataset Training & Blending</h3>
+      <h3>1. Style Presets & Blending Engine</h3>
       <div class="grid">
         <div class="form-group">
-          <label for="midi-file">Upload MIDI Files (Select Multiple)</label>
-          <input type="file" id="midi-file" accept=".mid,.midi" multiple>
-        </div>
-        <div class="form-group">
-          <label for="preset-select">Preset Style Base</label>
+          <label for="preset-select">Style Preset Library</label>
           <select id="preset-select" onchange="updateDatasetBlend()">
-            <option value="baroque">Baroque Bach Counterpoint</option>
-            <option value="jazz">Jazz Blues Scale Riff</option>
-            <option value="pentatonic">Asian Pentatonic Folk</option>
-            <option value="chopin">Romantic Chopin Nocturne</option>
-            <option value="synthwave">Synthwave Arpeggios</option>
-            <option value="ambient">Lydian Ambient Float</option>
+            <option value="baroque">1. Baroque Bach Counterpoint (Polyphonic felt)</option>
+            <option value="chopin">2. Romantic Chopin Nocturne (Expressive Rubato)</option>
+            <option value="jazz">3. Jazz Bebop & Blues (Syncopated Swing)</option>
+            <option value="synthwave">4. 80s Synthwave Cyber Arp (Driving 16ths)</option>
+            <option value="funk">5. Funk Slap Bass & Groove (Staccato Accents)</option>
+            <option value="flamenco">6. Spanish Flamenco Phrygian Run (Rapid Triplets)</option>
+            <option value="lofi">7. Lo-Fi Hip Hop Chill (Laidback 7ths)</option>
+            <option value="heroic">8. Cinematic Heroic Brass (Triadic Leaps)</option>
+            <option value="pentatonic">9. East Asian Folk Pentatonic (Spacious)</option>
+            <option value="ambient">10. Lydian Ambient Drone (Floating Holds)</option>
           </select>
         </div>
+
+        <div class="form-group">
+          <label for="midi-file">Upload Custom MIDI Files</label>
+          <input type="file" id="midi-file" accept=".mid,.midi" multiple>
+        </div>
+
         <div class="form-group">
           <div class="form-group-row">
-            <label for="blend-slider">Source Weight (File vs Preset)</label>
-            <span class="val-display" id="blend-val">0% Preset / 100% Upload</span>
+            <label for="blend-slider">Source Blend (Uploaded vs Preset)</label>
+            <span class="val-display" id="blend-val">100% Preset / 0% Upload</span>
           </div>
-          <input type="range" id="blend-slider" min="0" max="1" step="0.05" value="0" oninput="updateDatasetBlend()">
+          <input type="range" id="blend-slider" min="0" max="1" step="0.05" value="1" oninput="updateDatasetBlend()">
         </div>
       </div>
-      <div id="dataset-status" class="status-badge">Dataset Loaded: 24 Note Objects (Preset)</div>
+      <div id="dataset-status" class="status-badge">Dataset Active: Baroque Preset (64 Note Objects)</div>
     </div>
 
     <div class="card">
-      <h3>2. Engine Controls & Influence Modifiers</h3>
+      <h3>2. Markov Engine & Groove Dynamics</h3>
       <div class="grid">
         <div class="form-group">
           <label for="order-select">Markov Order (N-Gram)</label>
           <select id="order-select" onchange="buildMatrix()">
             <option value="1">Order 1 (High Variation)</option>
-            <option value="2" selected>Order 2 (Balanced Motifs)</option>
-            <option value="3">Order 3 (Strict Phrase Cloning)</option>
+            <option value="2" selected>Order 2 (Balanced Phrases)</option>
+            <option value="3">Order 3 (Strict Motif Clone)</option>
           </select>
         </div>
 
@@ -256,16 +262,24 @@
 
         <div class="form-group">
           <div class="form-group-row">
-            <label for="mutation-input">Mutation Rate (Random Injections)</label>
-            <span class="val-display" id="mutation-val">0%</span>
+            <label for="swing-input">Swing / Humanize Feeling</label>
+            <span class="val-display" id="swing-val">20%</span>
           </div>
-          <input type="range" id="mutation-input" min="0" max="50" step="1" value="0" oninput="document.getElementById('mutation-val').textContent = this.value + '%'">
+          <input type="range" id="swing-input" min="0" max="60" step="5" value="20" oninput="document.getElementById('swing-val').textContent = this.value + '%'">
+        </div>
+
+        <div class="form-group">
+          <div class="form-group-row">
+            <label for="trans-input">Octave Shift</label>
+            <span class="val-display" id="trans-val">0 ST</span>
+          </div>
+          <input type="range" id="trans-input" min="-24" max="24" step="12" value="0" oninput="document.getElementById('trans-val').textContent = (this.value > 0 ? '+' : '') + this.value + ' ST'">
         </div>
 
         <div class="form-group">
           <label for="scale-select">Key / Scale Lock</label>
           <select id="scale-select">
-            <option value="chromatic">Off (Raw Source Pitches)</option>
+            <option value="chromatic">Off (Raw Preset/File Pitches)</option>
             <option value="major">C Major</option>
             <option value="minor">A Minor</option>
             <option value="dorian">D Dorian</option>
@@ -277,22 +291,11 @@
           <label for="tempo-input">Tempo (BPM)</label>
           <input type="number" id="tempo-input" value="120" min="40" max="240">
         </div>
-
-        <div class="form-group">
-          <label for="length-select">Sequence Note Count</label>
-          <select id="length-select">
-            <option value="16">16 Notes</option>
-            <option value="32" selected>32 Notes</option>
-            <option value="64">64 Notes</option>
-            <option value="128">128 Notes</option>
-            <option value="infinite">Infinite Stream</option>
-          </select>
-        </div>
       </div>
     </div>
 
     <div class="card">
-      <h3>3. Real-Time Stream & Visualizer</h3>
+      <h3>3. Real-Time Performance & Visualizer</h3>
       
       <div class="visualizer-box" id="current-note">--</div>
 
@@ -302,35 +305,120 @@
       </div>
 
       <div class="btn-group">
-        <button class="btn" id="play-btn" style="flex: 2;" onclick="togglePlayback()">▶ Play Stream</button>
+        <button class="btn" id="play-btn" style="flex: 2;" onclick="togglePlayback()">▶ Play Performance</button>
         <button class="btn btn-secondary" style="flex: 1;" onclick="exportMidi()">Export Sequence (.mid)</button>
       </div>
 
       <div class="form-group">
-        <label>Markov Log Stream</label>
-        <div class="log-box" id="log-box">Engine initialized with Rhythmic Note Objects & Temperature control.</div>
+        <label>Markov Activity Log</label>
+        <div class="log-box" id="log-box">Engine ready with rich preset multi-dimensional datasets.</div>
       </div>
     </div>
   </div>
 
   <script>
-    // Helper to generate Note Objects { pitch, duration (beats), velocity (0-127) }
-    function buildRhythmicPreset(pitches, durPattern = [0.25, 0.25, 0.5, 0.25], velPattern = [90, 75, 100, 80]) {
-      return pitches.map((p, i) => ({
-        pitch: p,
-        duration: durPattern[i % durPattern.length],
-        velocity: velPattern[i % velPattern.length]
-      }));
-    }
-
-    const PRESETS = {
-      baroque: buildRhythmicPreset([60, 62, 64, 65, 67, 65, 64, 62, 60, 67, 69, 71, 72, 71, 69, 67, 65, 64, 62, 60, 64, 67, 72, 60], [0.25, 0.25, 0.25, 0.25, 0.5, 0.25, 0.25, 0.5], [95, 80, 85, 80, 110, 75, 85, 90]),
-      jazz: buildRhythmicPreset([60, 63, 65, 66, 67, 70, 72, 70, 67, 66, 65, 63, 60, 58, 60, 63, 65, 67, 70, 72], [0.33, 0.17, 0.33, 0.17, 0.5, 0.25, 0.25, 0.5], [100, 70, 95, 65, 110, 80, 85, 100]),
-      pentatonic: buildRhythmicPreset([60, 62, 65, 67, 69, 72, 69, 67, 65, 62, 60, 65, 67, 72, 69, 65, 62, 60], [0.5, 0.25, 0.25, 0.5, 0.5, 1.0], [90, 80, 85, 95, 85, 105]),
-      chopin: buildRhythmicPreset([60, 63, 67, 70, 72, 75, 74, 72, 70, 67, 63, 60, 58, 62, 65, 68, 70, 74, 72], [0.75, 0.25, 0.5, 0.5, 0.25, 0.25, 0.5, 1.0], [85, 65, 90, 80, 70, 75, 95, 100]),
-      synthwave: buildRhythmicPreset([48, 60, 48, 63, 48, 65, 48, 67, 48, 65, 48, 63, 48, 60, 48, 58], [0.25, 0.25, 0.25, 0.25], [110, 85, 100, 85]),
-      ambient: buildRhythmicPreset([60, 62, 66, 67, 71, 72, 71, 67, 66, 62, 60, 64, 66, 71, 74, 72], [1.0, 0.5, 0.5, 1.0, 1.5, 0.5], [70, 65, 75, 80, 70, 85])
+    // --- RICH MULTI-DIMENSIONAL PRESETS (Pitch, Duration in beats, Velocity 0-127, Synth Timbre) ---
+    const PRESET_LIBRARY = {
+      baroque: {
+        name: "Baroque Bach Counterpoint",
+        synth: { type: 'sawtooth', attack: 0.01, decay: 0.2, filterFreq: 2500 },
+        data: createPresetPattern([
+          { p: [60, 62, 64, 65, 67, 65, 64, 62, 60, 67, 69, 71, 72, 71, 69, 67], d: 0.25, v: 90 },
+          { p: [65, 64, 62, 60, 64, 67, 72, 60, 62, 64, 65, 67, 65, 64, 62], d: 0.25, v: 85 },
+          { p: [60, 67, 69, 71, 72, 71, 69, 67, 65, 64, 62, 60, 64, 67, 72], d: 0.5, v: 105 }
+        ])
+      },
+      chopin: {
+        name: "Romantic Chopin Nocturne",
+        synth: { type: 'sine', attack: 0.04, decay: 0.8, filterFreq: 1800 },
+        data: createPresetPattern([
+          { p: [60, 63, 67, 70], d: 0.5, v: 70 },
+          { p: [72, 75, 74, 72, 70], d: 0.33, v: 95 },
+          { p: [67, 63, 60, 58], d: 0.25, v: 60 },
+          { p: [62, 65, 68, 70, 74, 72, 70, 67], d: 0.5, v: 85 }
+        ])
+      },
+      jazz: {
+        name: "Jazz Bebop & Blues",
+        synth: { type: 'triangle', attack: 0.01, decay: 0.25, filterFreq: 3000 },
+        data: createPresetPattern([
+          { p: [60, 63, 65, 66, 67], d: 0.33, v: 95 },
+          { p: [70, 72, 70, 67], d: 0.17, v: 75 },
+          { p: [66, 65, 63, 60], d: 0.5, v: 105 },
+          { p: [58, 60, 63, 65, 67, 70, 72], d: 0.25, v: 85 }
+        ])
+      },
+      synthwave: {
+        name: "80s Synthwave Cyber Arp",
+        synth: { type: 'square', attack: 0.005, decay: 0.15, filterFreq: 4000 },
+        data: createPresetPattern([
+          { p: [36, 48, 36, 51, 36, 53, 36, 55, 36, 53, 36, 51, 36, 48, 36, 46], d: 0.25, v: 110 }
+        ])
+      },
+      funk: {
+        name: "Funk Slap Bass & Groove",
+        synth: { type: 'sawtooth', attack: 0.005, decay: 0.12, filterFreq: 5000 },
+        data: createPresetPattern([
+          { p: [38, 38], d: 0.125, v: 120 },
+          { p: [50], d: 0.25, v: 100 },
+          { p: [38, 41, 43], d: 0.125, v: 115 },
+          { p: [45, 43, 41, 38], d: 0.25, v: 90 }
+        ])
+      },
+      flamenco: {
+        name: "Spanish Flamenco Run",
+        synth: { type: 'triangle', attack: 0.01, decay: 0.18, filterFreq: 3500 },
+        data: createPresetPattern([
+          { p: [64, 63, 61, 60], d: 0.16, v: 100 },
+          { p: [65, 64, 63, 61], d: 0.16, v: 110 },
+          { p: [60, 59, 57, 56, 57, 59, 60], d: 0.25, v: 85 }
+        ])
+      },
+      lofi: {
+        name: "Lo-Fi Hip Hop Chill",
+        synth: { type: 'sine', attack: 0.03, decay: 0.6, filterFreq: 1200 },
+        data: createPresetPattern([
+          { p: [57, 60, 64, 67], d: 0.75, v: 65 },
+          { p: [55, 59, 62, 66], d: 0.75, v: 60 },
+          { p: [53, 57, 60, 64], d: 0.5, v: 70 }
+        ])
+      },
+      heroic: {
+        name: "Cinematic Heroic Brass",
+        synth: { type: 'sawtooth', attack: 0.05, decay: 0.4, filterFreq: 2200 },
+        data: createPresetPattern([
+          { p: [60, 67, 72], d: 0.5, v: 115 },
+          { p: [74, 76, 72], d: 0.25, v: 120 },
+          { p: [67, 65, 67, 72], d: 1.0, v: 110 }
+        ])
+      },
+      pentatonic: {
+        name: "Asian Pentatonic Folk",
+        synth: { type: 'sine', attack: 0.02, decay: 0.5, filterFreq: 2800 },
+        data: createPresetPattern([
+          { p: [60, 62, 65, 67, 69, 72], d: 0.5, v: 85 },
+          { p: [69, 67, 65, 62, 60], d: 0.5, v: 75 }
+        ])
+      },
+      ambient: {
+        name: "Lydian Ambient Drone",
+        synth: { type: 'sine', attack: 0.1, decay: 1.2, filterFreq: 1500 },
+        data: createPresetPattern([
+          { p: [60, 62, 66, 67, 71, 72], d: 1.0, v: 60 },
+          { p: [74, 72, 71, 67, 66], d: 1.5, v: 55 }
+        ])
+      }
     };
+
+    function createPresetPattern(groups) {
+      const result = [];
+      groups.forEach(g => {
+        g.p.forEach(pitch => {
+          result.push({ pitch: pitch, duration: g.d, velocity: g.v });
+        });
+      });
+      return result;
+    }
 
     const SCALES = {
       chromatic: null,
@@ -341,7 +429,7 @@
     };
 
     let uploadedDataset = [];
-    let dataset = [...PRESETS.baroque];
+    let dataset = [];
     let transitionMatrix = {};
     let isPlaying = false;
     let audioCtx = null;
@@ -368,14 +456,13 @@
       return noteArray.map(n => `${n.pitch}:${n.duration}:${n.velocity}`).join('|');
     }
 
-    // --- SCALE QUANTIZATION / KEY LOCK ---
     function quantizeToScale(midiNote) {
       const scaleKey = document.getElementById('scale-select').value;
       const scalePattern = SCALES[scaleKey];
-      if (!scalePattern) return midiNote; // Chromatic (no change)
+      if (!scalePattern) return midiNote;
 
       const octave = Math.floor(midiNote / 12);
-      const pitchClass = midiNote % 12;
+      const pitchClass = (midiNote % 12 + 12) % 12;
 
       let closest = scalePattern[0];
       let minDiff = Math.abs(pitchClass - closest);
@@ -391,30 +478,29 @@
       return (octave * 12) + closest;
     }
 
-    // --- BLENDING & MATRIX BUILDER ---
     function updateDatasetBlend() {
-      const blendWeight = parseFloat(document.getElementById('blend-slider').value); // 0.0 to 1.0
+      const blendWeight = parseFloat(document.getElementById('blend-slider').value); // 0.0 (upload) to 1.0 (preset)
       const presetKey = document.getElementById('preset-select').value;
-      const presetData = PRESETS[presetKey] || [];
+      const presetObj = PRESET_LIBRARY[presetKey] || PRESET_LIBRARY.baroque;
 
       const blendLabel = document.getElementById('blend-val');
       blendLabel.textContent = `${Math.round(blendWeight * 100)}% Preset / ${Math.round((1 - blendWeight) * 100)}% Upload`;
 
       if (uploadedDataset.length === 0) {
-        dataset = [...presetData];
+        dataset = [...presetObj.data];
       } else {
+        const presetCount = Math.round(presetObj.data.length * blendWeight);
         const uploadCount = Math.round(uploadedDataset.length * (1 - blendWeight));
-        const presetCount = Math.round(presetData.length * blendWeight);
 
         dataset = [
-          ...uploadedDataset.slice(0, Math.max(1, uploadCount)),
-          ...presetData.slice(0, presetCount)
+          ...presetObj.data.slice(0, Math.max(1, presetCount)),
+          ...uploadedDataset.slice(0, Math.max(1, uploadCount))
         ];
       }
 
       const badge = document.getElementById('dataset-status');
-      badge.textContent = `Dataset Loaded: ${dataset.length} Note Objects (${uploadedDataset.length > 0 ? 'Blended' : 'Preset'})`;
-      if (uploadedDataset.length > 0) badge.classList.add('active');
+      badge.textContent = `Dataset Active: ${presetObj.name} (${dataset.length} Note Objects)`;
+      badge.classList.add('active');
 
       buildMatrix();
     }
@@ -445,42 +531,21 @@
       logBox.scrollTop = logBox.scrollHeight;
     }
 
-    // --- PROBABILISTIC NOTE SELECTION WITH TEMPERATURE & MUTATION ---
     function getNextNoteObject() {
       const order = parseInt(document.getElementById('order-select').value);
       const temp = parseFloat(document.getElementById('temp-input').value) || 1.0;
-      const mutationRate = (parseFloat(document.getElementById('mutation-input').value) || 0) / 100;
+      const shift = parseInt(document.getElementById('trans-input').value) || 0;
 
-      // Ensure seed history is ready
       if (currentHistory.length < order) {
         currentHistory = dataset.slice(0, order);
       }
 
-      // Check for Mutation trigger
-      if (Math.random() < mutationRate) {
-        const lastNote = currentHistory[currentHistory.length - 1];
-        const basePitch = lastNote ? lastNote.pitch : 60;
-        const mutatedPitch = basePitch + (Math.floor(Math.random() * 11) - 5);
-        
-        const mutatedNote = {
-          pitch: quantizeToScale(Math.max(36, Math.min(84, mutatedPitch))),
-          duration: [0.25, 0.5, 0.25, 0.125][Math.floor(Math.random() * 4)],
-          velocity: Math.floor(60 + Math.random() * 50)
-        };
-        currentHistory.push(mutatedNote);
-        logMessage(`[Mutation] Jumped to ${midiToName(mutatedNote.pitch)}`);
-        return mutatedNote;
-      }
-
-      // Backoff Strategy: Order N -> Order 1
       for (let currentOrder = order; currentOrder >= 1; currentOrder--) {
         const stateKey = getNoteStateKey(currentHistory.slice(-currentOrder));
         const optionsMap = transitionMatrix[stateKey];
 
         if (optionsMap && Object.keys(optionsMap).length > 0) {
           const entries = Object.entries(optionsMap);
-          
-          // Apply Softmax Temperature formula to frequency counts
           const weights = entries.map(([_, count]) => Math.pow(count, 1 / temp));
           const totalWeight = weights.reduce((sum, w) => sum + w, 0);
 
@@ -496,8 +561,9 @@
           }
 
           const [p, d, v] = selectedStr.split(':').map(Number);
-          const noteObj = { pitch: quantizeToScale(p), duration: d, velocity: v };
-          
+          const rawPitch = p + shift;
+          const noteObj = { pitch: quantizeToScale(rawPitch), duration: d, velocity: v };
+
           currentHistory.push(noteObj);
           if (currentHistory.length > order * 2) {
             currentHistory = currentHistory.slice(-order);
@@ -506,34 +572,41 @@
         }
       }
 
-      // Final Fallback: Random note from dataset
       const rawFallback = dataset[Math.floor(Math.random() * dataset.length)];
-      const fallbackNote = { ...rawFallback, pitch: quantizeToScale(rawFallback.pitch) };
+      const fallbackNote = { ...rawFallback, pitch: quantizeToScale(rawFallback.pitch + shift) };
       currentHistory.push(fallbackNote);
       return fallbackNote;
     }
 
-    // --- SYNTHESIZER ENGINE ---
+    // --- SYNTHESIZER ENGINE WITH PRESET TIMBRE PROFILES ---
     function playSynthNote(noteObj, bpm) {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
 
+      const presetKey = document.getElementById('preset-select').value;
+      const synthProfile = (PRESET_LIBRARY[presetKey] || PRESET_LIBRARY.baroque).synth;
+
       const durationSeconds = (60 / bpm) * noteObj.duration;
       const velocityGain = Math.max(0.1, noteObj.velocity / 127);
 
       const osc = audioCtx.createOscillator();
+      const filter = audioCtx.createBiquadFilter();
       const gain = audioCtx.createGain();
       const now = audioCtx.currentTime;
 
-      osc.type = 'sawtooth';
+      osc.type = synthProfile.type;
       osc.frequency.setValueAtTime(midiToFreq(noteObj.pitch), now);
 
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(synthProfile.filterFreq, now);
+
       gain.gain.setValueAtTime(0, now);
-      gain.gain.linearRampToValueAtTime(0.25 * velocityGain, now + 0.015);
+      gain.gain.linearRampToValueAtTime(0.3 * velocityGain, now + synthProfile.attack);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSeconds);
 
-      osc.connect(gain);
+      osc.connect(filter);
+      filter.connect(gain);
       gain.connect(audioCtx.destination);
 
       osc.start(now);
@@ -542,7 +615,6 @@
       return durationSeconds;
     }
 
-    // --- PIANO ROLL CANVAS RENDERING ---
     function drawNoteOnPianoRoll(noteObj) {
       const canvas = document.getElementById('piano-roll');
       const ctx = canvas.getContext('2d');
@@ -557,26 +629,17 @@
       ctx.fillStyle = '#0f172a';
       ctx.fillRect(width - speedPx, 0, speedPx, height);
 
-      ctx.strokeStyle = '#1e293b';
-      ctx.lineWidth = 1;
-      for (let i = 0; i < height; i += 20) {
-        ctx.beginPath();
-        ctx.moveTo(width - speedPx, i);
-        ctx.lineTo(width, i);
-        ctx.stroke();
-      }
-
       const clampedPitch = Math.max(MIN_MIDI, Math.min(MAX_MIDI, noteObj.pitch));
       const normalizedPitch = (clampedPitch - MIN_MIDI) / (MAX_MIDI - MIN_MIDI);
-      
+
       const blockHeight = 10;
       const y = height - (normalizedPitch * (height - blockHeight)) - blockHeight;
       const alpha = Math.max(0.4, noteObj.velocity / 127);
-      
+
       ctx.fillStyle = `rgba(139, 92, 246, ${alpha})`;
       ctx.shadowColor = '#8b5cf6';
       ctx.shadowBlur = 8;
-      
+
       ctx.fillRect(width - speedPx + 2, y, speedPx - 4, blockHeight);
       ctx.shadowBlur = 0;
     }
@@ -588,18 +651,11 @@
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    // --- STEP DRIVER ---
     function step() {
       if (!isPlaying) return;
 
       const bpm = parseInt(document.getElementById('tempo-input').value) || 120;
-      const targetLengthVal = document.getElementById('length-select').value;
-
-      if (targetLengthVal !== 'infinite' && currentNoteCount >= parseInt(targetLengthVal)) {
-        stopPlayback();
-        logMessage(`Completed sequence of ${targetLengthVal} notes.`);
-        return;
-      }
+      const swingAmount = parseInt(document.getElementById('swing-input').value) || 0;
 
       const noteObj = getNextNoteObject();
       generatedHistory.push(noteObj);
@@ -609,29 +665,30 @@
         `${midiToName(noteObj.pitch)} | Dur: ${noteObj.duration}b | Vel: ${noteObj.velocity}`;
 
       drawNoteOnPianoRoll(noteObj);
-      const durationSeconds = playSynthNote(noteObj, bpm);
+      let durationSeconds = playSynthNote(noteObj, bpm);
+
+      // Apply Swing feeling to alternate 16th notes
+      if (currentNoteCount % 2 === 1 && swingAmount > 0) {
+        durationSeconds *= (1 + (swingAmount / 100));
+      }
 
       timerId = setTimeout(step, durationSeconds * 1000);
     }
 
     async function togglePlayback() {
       if (!isPlaying) {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-          await audioCtx.resume();
-        }
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
 
         isPlaying = true;
         currentNoteCount = 0;
         generatedHistory = [];
         currentHistory = [];
-        
+
         clearPianoRoll();
-        
+
         const btn = document.getElementById('play-btn');
-        btn.textContent = '⏸ Pause Stream';
+        btn.textContent = '⏸ Pause Performance';
         btn.style.backgroundColor = 'var(--danger)';
         step();
       } else {
@@ -643,11 +700,11 @@
       isPlaying = false;
       clearTimeout(timerId);
       const btn = document.getElementById('play-btn');
-      btn.textContent = '▶ Play Stream';
+      btn.textContent = '▶ Play Performance';
       btn.style.backgroundColor = 'var(--accent)';
     }
 
-    // --- EXPRESSIVE MULTI-FILE MIDI IMPORT ---
+    // --- MIDI PARSING ---
     document.getElementById('midi-file').addEventListener('change', async function(e) {
       const files = Array.from(e.target.files);
       if (!files.length) return;
@@ -671,10 +728,9 @@
 
       if (combinedNotes.length > 0) {
         uploadedDataset = combinedNotes;
+        document.getElementById('blend-slider').value = 0.5; // Auto adjust blend to 50/50 when files uploaded
         updateDatasetBlend();
-        logMessage(`Parsed ${parsedCount} MIDI file(s) into ${uploadedDataset.length} Note Objects (Preserving Pitch, Duration & Velocity).`);
-      } else {
-        alert('Could not extract note events. Ensure files are valid .mid formats.');
+        logMessage(`Parsed ${parsedCount} MIDI file(s) into ${uploadedDataset.length} Note Objects.`);
       }
     });
 
@@ -737,7 +793,6 @@
           const key = bytes[p++];
           const vel = bytes[p++];
           if (vel > 0 && key >= 21 && key <= 108) {
-            // Quantize delta time into musical note durations (0.25 = quarter note)
             const calculatedDur = delta > 0 ? Math.max(0.125, Math.min(1.0, Math.round((delta / 96) * 4) / 4)) : 0.25;
             notes.push({ pitch: key, duration: calculatedDur, velocity: vel });
           }
@@ -762,12 +817,10 @@
       return buffer;
     }
 
-    // --- EXPRESSIVE MIDI EXPORT ---
     function exportMidi() {
-      const targetLengthVal = document.getElementById('length-select').value;
-      const targetCount = targetLengthVal === 'infinite' ? 64 : parseInt(targetLengthVal);
-      
+      const targetCount = 64;
       let notesToExport = [];
+
       if (generatedHistory.length >= targetCount) {
         notesToExport = generatedHistory.slice(0, targetCount);
       } else {
@@ -780,11 +833,11 @@
 
       const bpm = parseInt(document.getElementById('tempo-input').value) || 120;
       const ticksPerQuarter = 96;
-      
+
       const header = [0x4d, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x01, 0x00, ticksPerQuarter];
       const trackHeader = [0x4d, 0x54, 0x72, 0x6b];
       let trackData = [];
-      
+
       const microsecondsPerQuarter = Math.round(60000000 / bpm);
       trackData.push(0x00, 0xFF, 0x51, 0x03, 
         (microsecondsPerQuarter >> 16) & 0xFF,
@@ -794,11 +847,7 @@
 
       notesToExport.forEach(noteObj => {
         const noteTicks = Math.round(noteObj.duration * ticksPerQuarter);
-        
-        // Note On (Delta-time 0) with original velocity
         trackData.push(0x00, 0x90, noteObj.pitch, noteObj.velocity);
-        
-        // Note Off after calculated noteTicks duration
         trackData.push(...writeVLQ(noteTicks), 0x80, noteObj.pitch, 0x00);
       });
 
@@ -813,12 +862,11 @@
       const blob = new Blob([new Uint8Array([...header, ...trackHeader, ...trackLenBytes, ...trackData])], { type: 'audio/midi' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `markov_expressive_sequence_${notesToExport.length}notes.mid`;
+      a.download = `markov_ultra_sequence_${notesToExport.length}notes.mid`;
       a.click();
-      logMessage(`Exported ${notesToExport.length}-note expressive MIDI file.`);
+      logMessage(`Exported ${notesToExport.length}-note MIDI file.`);
     }
 
-    // Startup Initialization
     clearPianoRoll();
     updateDatasetBlend();
   </script>
