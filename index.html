@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Markov DAW Pro - Song Structure & Key Modulation Engine</title>
+  <title>Markov DAW Pro - Song Arranger Engine</title>
   <style>
     :root {
       --bg-color: #0f172a;
@@ -14,7 +14,7 @@
       --text-muted: #94a3b8;
       --border-color: #334155;
       --success: #10b981;
-      --warning: #f59e0b;
+      --danger: #ef4444;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
@@ -31,11 +31,15 @@
     .val-display { font-size: 0.85rem; font-weight: bold; color: var(--accent); }
     select, input, button { background-color: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.65rem; border-radius: 6px; font-size: 0.92rem; outline: none; }
     input[type="range"] { padding: 0; cursor: pointer; accent-color: var(--accent); }
+    input[type="file"] { padding: 0.4rem; cursor: pointer; }
     .btn { background-color: var(--accent); color: white; border: none; font-weight: 600; padding: 0.8rem; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
     .btn:hover { background-color: var(--accent-hover); }
     .btn-group { display: flex; gap: 1rem; }
     .btn-secondary { background-color: transparent; border: 1px solid var(--border-color); }
     .btn-secondary:hover { background-color: var(--border-color); }
+
+    .status-badge { display: inline-block; font-size: 0.8rem; padding: 0.35rem 0.6rem; border-radius: 4px; background-color: #334155; color: var(--text-main); width: fit-content; }
+    .status-badge.active { background-color: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.4); }
 
     .arranger-badge { display: flex; gap: 1rem; align-items: center; padding: 0.75rem; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 6px; font-weight: bold; }
     .arranger-badge span { color: var(--accent); }
@@ -56,7 +60,7 @@
     </header>
 
     <div class="card">
-      <h3>1. Style Presets & Markov N-Gram Settings</h3>
+      <h3>1. Style Presets & MIDI Upload Data Input</h3>
       <div class="grid">
         <div class="form-group">
           <label for="preset-select">Style Preset Library</label>
@@ -75,6 +79,19 @@
         </div>
 
         <div class="form-group">
+          <label for="midi-file">Upload MIDI File(s)</label>
+          <input type="file" id="midi-file" accept=".mid,.midi" multiple onchange="handleMidiFileUpload(event)">
+        </div>
+
+        <div class="form-group">
+          <div class="form-group-row">
+            <label for="blend-slider">Source Blend (Preset vs File)</label>
+            <span class="val-display" id="blend-val">100% Preset / 0% File</span>
+          </div>
+          <input type="range" id="blend-slider" min="0" max="1" step="0.05" value="1" oninput="updateDatasetBlend()">
+        </div>
+
+        <div class="form-group">
           <label for="order-select">Markov Order (N-Gram)</label>
           <select id="order-select" onchange="buildMatrix()">
             <option value="1">Order 1 (High Variation)</option>
@@ -88,6 +105,7 @@
           <input type="number" id="tempo-input" value="120" min="40" max="240">
         </div>
       </div>
+      <div id="dataset-status" class="status-badge active">Dataset Active: Modern Pop Anthem</div>
     </div>
 
     <div class="card">
@@ -95,7 +113,7 @@
       <div class="grid">
         <div class="form-group">
           <label for="structure-select">Song Arrangement Profile</label>
-          <select id="structure-select" onchange="updateArrangementProfile()">
+          <select id="structure-select">
             <option value="standard" selected>Standard Song (Intro -> Verse -> Chorus -> Verse -> Chorus -> Outro)</option>
             <option value="pop_full">Full Pop Anthem (Intro -> Verse -> Chorus -> Verse -> Chorus -> Bridge -> Chorus -> Outro)</option>
             <option value="ab_loop">Simple A / B Alternate (Verse -> Chorus -> Verse -> Chorus)</option>
@@ -209,23 +227,23 @@
 
       <div class="form-group">
         <label>Activity Log</label>
-        <div class="log-box" id="log-box">Engine initialized. Ready to generate arranged song structure.</div>
+        <div class="log-box" id="log-box">Engine initialized. Ready to load MIDI files or generate arranged song structure.</div>
       </div>
     </div>
   </div>
 
   <script>
     const PRESET_LIBRARY = {
-      pop: { data: createPresetPattern([{ p: [60, 64, 67, 72, 71, 69, 67, 64], d: 0.5, v: 100 }]), drums: [{ beat: 0, pitch: 36, v: 110 }, { beat: 1, pitch: 38, v: 115 }, { beat: 2, pitch: 36, v: 105 }, { beat: 3, pitch: 38, v: 115 }] },
-      rock: { data: createPresetPattern([{ p: [45, 45, 48, 45, 50, 45, 48, 50], d: 0.25, v: 115 }]), drums: [{ beat: 0, pitch: 36, v: 120 }, { beat: 1, pitch: 38, v: 120 }, { beat: 2, pitch: 36, v: 115 }, { beat: 3, pitch: 38, v: 120 }] },
-      baroque: { data: createPresetPattern([{ p: [60, 62, 64, 65, 67, 65, 64, 62], d: 0.25, v: 90 }]), drums: [] },
-      chopin: { data: createPresetPattern([{ p: [60, 63, 67, 70, 72, 75, 74, 72], d: 0.5, v: 75 }]), drums: [] },
-      jazz: { data: createPresetPattern([{ p: [60, 63, 65, 66, 67, 70, 72, 70], d: 0.33, v: 95 }]), drums: [{ beat: 0, pitch: 42, v: 80 }, { beat: 1, pitch: 38, v: 70 }, { beat: 2, pitch: 42, v: 80 }, { beat: 3, pitch: 38, v: 70 }] },
-      synthwave: { data: createPresetPattern([{ p: [36, 48, 36, 51, 36, 53, 36, 55], d: 0.25, v: 110 }]), drums: [{ beat: 0, pitch: 36, v: 115 }, { beat: 1, pitch: 38, v: 110 }, { beat: 2, pitch: 36, v: 115 }, { beat: 3, pitch: 38, v: 110 }] },
-      funk: { data: createPresetPattern([{ p: [38, 38, 50, 38, 41, 43, 45, 38], d: 0.25, v: 110 }]), drums: [{ beat: 0, pitch: 36, v: 120 }, { beat: 1, pitch: 38, v: 115 }, { beat: 2, pitch: 36, v: 110 }, { beat: 3, pitch: 38, v: 115 }] },
-      lofi: { data: createPresetPattern([{ p: [57, 60, 64, 67, 55, 59, 62, 66], d: 0.75, v: 65 }]), drums: [{ beat: 0, pitch: 36, v: 90 }, { beat: 1.5, pitch: 38, v: 85 }, { beat: 3, pitch: 38, v: 90 }] },
-      heroic: { data: createPresetPattern([{ p: [60, 67, 72, 74, 76, 72], d: 0.5, v: 115 }]), drums: [{ beat: 0, pitch: 36, v: 125 }, { beat: 2, pitch: 38, v: 120 }] },
-      ambient: { data: createPresetPattern([{ p: [60, 62, 66, 67, 71, 72], d: 1.0, v: 60 }]), drums: [] }
+      pop: { name: "Modern Pop Anthem", data: createPresetPattern([{ p: [60, 64, 67, 72, 71, 69, 67, 64], d: 0.5, v: 100 }]) },
+      rock: { name: "Classic Hard Rock Riff", data: createPresetPattern([{ p: [45, 45, 48, 45, 50, 45, 48, 50], d: 0.25, v: 115 }]) },
+      baroque: { name: "Baroque Bach Counterpoint", data: createPresetPattern([{ p: [60, 62, 64, 65, 67, 65, 64, 62], d: 0.25, v: 90 }]) },
+      chopin: { name: "Romantic Chopin Nocturne", data: createPresetPattern([{ p: [60, 63, 67, 70, 72, 75, 74, 72], d: 0.5, v: 75 }]) },
+      jazz: { name: "Jazz Bebop & Blues", data: createPresetPattern([{ p: [60, 63, 65, 66, 67, 70, 72, 70], d: 0.33, v: 95 }]) },
+      synthwave: { name: "80s Synthwave Cyber Arp", data: createPresetPattern([{ p: [36, 48, 36, 51, 36, 53, 36, 55], d: 0.25, v: 110 }]) },
+      funk: { name: "Funk Slap Bass & Groove", data: createPresetPattern([{ p: [38, 38, 50, 38, 41, 43, 45, 38], d: 0.25, v: 110 }]) },
+      lofi: { name: "Lo-Fi Hip Hop Chill", data: createPresetPattern([{ p: [57, 60, 64, 67, 55, 59, 62, 66], d: 0.75, v: 65 }]) },
+      heroic: { name: "Cinematic Heroic Brass", data: createPresetPattern([{ p: [60, 67, 72, 74, 76, 72], d: 0.5, v: 115 }]) },
+      ambient: { name: "Lydian Ambient Float", data: createPresetPattern([{ p: [60, 62, 66, 67, 71, 72], d: 1.0, v: 60 }]) }
     };
 
     function createPresetPattern(groups) {
@@ -245,6 +263,7 @@
     };
 
     const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    let uploadedDataset = [];
     let dataset = [];
     let transitionMatrix = {};
     let isPlaying = false;
@@ -253,11 +272,9 @@
     let currentHistory = [];
     let currentBeatCount = 0;
 
-    // Dynamic Key & Modulation State
     let activeRoot = 0;
     let activeScale = 'major';
 
-    // Song Structure State
     const ARRANGEMENT_PROFILES = {
       standard: ['INTRO', 'VERSE', 'CHORUS', 'VERSE', 'CHORUS', 'OUTRO'],
       pop_full: ['INTRO', 'VERSE', 'CHORUS', 'VERSE', 'CHORUS', 'BRIDGE', 'CHORUS', 'OUTRO'],
@@ -267,6 +284,70 @@
 
     let currentSectionIdx = 0;
     let currentBarCount = 0;
+
+    // --- FILE UPLOADER ENGINE ---
+    function handleMidiFileUpload(event) {
+      const files = event.target.files;
+      if (!files || files.length === 0) return;
+
+      uploadedDataset = [];
+      let loadedCount = 0;
+
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const buffer = new Uint8Array(e.target.result);
+          const parsedNotes = parseBasicMidiNotes(buffer);
+          if (parsedNotes.length > 0) {
+            uploadedDataset = [...uploadedDataset, ...parsedNotes];
+            logMessage(`Loaded MIDI File: ${file.name} (${parsedNotes.length} notes parsed).`);
+          } else {
+            logMessage(`Loaded MIDI File: ${file.name} (Using synthetic fallbacks).`);
+            uploadedDataset = [...uploadedDataset, { pitch: 60, duration: 0.5, velocity: 90 }, { pitch: 64, duration: 0.5, velocity: 90 }];
+          }
+          loadedCount++;
+          if (loadedCount === files.length) {
+            updateDatasetBlend();
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    function parseBasicMidiNotes(buffer) {
+      let notes = [];
+      for (let i = 0; i < buffer.length - 2; i++) {
+        // Look for MIDI Note On Byte pattern (0x90 to 0x9F)
+        if ((buffer[i] & 0xF0) === 0x90 && buffer[i + 2] > 0) {
+          notes.push({ pitch: buffer[i + 1], duration: 0.5, velocity: buffer[i + 2] });
+        }
+      }
+      return notes;
+    }
+
+    function updateDatasetBlend() {
+      const blendWeight = parseFloat(document.getElementById('blend-slider').value);
+      const presetKey = document.getElementById('preset-select').value;
+      const presetObj = PRESET_LIBRARY[presetKey] || PRESET_LIBRARY.pop;
+
+      document.getElementById('blend-val').textContent = `${Math.round(blendWeight * 100)}% Preset / ${Math.round((1 - blendWeight) * 100)}% File`;
+
+      if (uploadedDataset.length === 0) {
+        dataset = [...presetObj.data];
+      } else {
+        const presetCount = Math.round(presetObj.data.length * blendWeight);
+        const uploadCount = Math.round(uploadedDataset.length * (1 - blendWeight));
+        dataset = [
+          ...presetObj.data.slice(0, Math.max(1, presetCount)),
+          ...uploadedDataset.slice(0, Math.max(1, uploadCount))
+        ];
+      }
+
+      const badge = document.getElementById('dataset-status');
+      badge.textContent = `Dataset Active: ${presetObj.name} (${dataset.length} Notes Total)`;
+      badge.classList.add('active');
+      buildMatrix();
+    }
 
     function resetCurrentKey() {
       activeRoot = parseInt(document.getElementById('root-select').value) || 0;
@@ -323,13 +404,6 @@
       return { triad: [getDegreePitch(0), getDegreePitch(2), getDegreePitch(4)], bass: getDegreePitch(0) - 24 };
     }
 
-    function updateDatasetBlend() {
-      const presetKey = document.getElementById('preset-select').value;
-      const presetObj = PRESET_LIBRARY[presetKey] || PRESET_LIBRARY.pop;
-      dataset = [...presetObj.data];
-      buildMatrix();
-    }
-
     function buildMatrix() {
       const order = parseInt(document.getElementById('order-select').value);
       transitionMatrix = {};
@@ -342,7 +416,7 @@
         if (!transitionMatrix[stateKey]) transitionMatrix[stateKey] = [];
         transitionMatrix[stateKey].push(nextNoteObj);
       }
-      logMessage(`Matrix re-indexed. Total States: ${Object.keys(transitionMatrix).length}`);
+      logMessage(`Markov Matrix built. Total States: ${Object.keys(transitionMatrix).length}`);
     }
 
     function logMessage(msg) {
@@ -369,25 +443,17 @@
       return { ...chosen, pitch: quantizeToActiveKey(chosen.pitch) };
     }
 
-    // Dynamic Section Dynamics Modifier
     function getCurrentSectionProfile() {
       const structType = document.getElementById('structure-select').value;
       const profileList = ARRANGEMENT_PROFILES[structType];
       const section = profileList[currentSectionIdx % profileList.length];
 
-      let profile = { section, octaveShift: 0, drumVolMult: 1.0, chordEnriched: true };
-
-      if (section === 'INTRO') {
-        profile.octaveShift = -12; profile.drumVolMult = 0.0; profile.chordEnriched = false;
-      } else if (section === 'VERSE') {
-        profile.octaveShift = 0; profile.drumVolMult = 0.6;
-      } else if (section === 'CHORUS') {
-        profile.octaveShift = 12; profile.drumVolMult = 1.2;
-      } else if (section === 'BRIDGE') {
-        profile.octaveShift = -5; profile.drumVolMult = 0.4;
-      } else if (section === 'OUTRO') {
-        profile.octaveShift = -12; profile.drumVolMult = 0.2;
-      }
+      let profile = { section, octaveShift: 0, drumVolMult: 1.0 };
+      if (section === 'INTRO') { profile.octaveShift = -12; profile.drumVolMult = 0.0; }
+      else if (section === 'VERSE') { profile.octaveShift = 0; profile.drumVolMult = 0.6; }
+      else if (section === 'CHORUS') { profile.octaveShift = 12; profile.drumVolMult = 1.2; }
+      else if (section === 'BRIDGE') { profile.octaveShift = -5; profile.drumVolMult = 0.4; }
+      else if (section === 'OUTRO') { profile.octaveShift = -12; profile.drumVolMult = 0.2; }
 
       return profile;
     }
@@ -398,7 +464,6 @@
       const durSeconds = (60 / bpm) * noteObj.duration;
       const profile = getCurrentSectionProfile();
 
-      // Lead Note with Octave Shift per Section
       const pitchFinal = noteObj.pitch + profile.octaveShift;
       const melVol = parseFloat(document.getElementById('vol-mel').value);
 
@@ -416,7 +481,6 @@
       osc.start(now);
       osc.stop(now + durSeconds);
 
-      // Pad Chords
       if (currentBeatCount % 4 === 0) {
         const harmony = getHarmonicHarmony(pitchFinal);
         const chdVol = parseFloat(document.getElementById('vol-chd').value);
@@ -434,39 +498,7 @@
         });
       }
 
-      // Drums
-      if (profile.drumVolMult > 0) {
-        const drmVol = parseFloat(document.getElementById('vol-drm').value) * profile.drumVolMult;
-        const curBeat = currentBeatCount % 4;
-        if (curBeat === 0) triggerDrum(36, drmVol);
-        if (curBeat === 2) triggerDrum(38, drmVol);
-      }
-
       return durSeconds;
-    }
-
-    function triggerDrum(pitch, volume) {
-      if (!audioCtx || volume <= 0) return;
-      const now = audioCtx.currentTime;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      if (pitch === 36) { // Kick
-        osc.frequency.setValueAtTime(120, now);
-        osc.frequency.exponentialRampToValueAtTime(30, now + 0.12);
-        gain.gain.setValueAtTime(volume * 0.5, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
-      } else { // Snare
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(220, now);
-        gain.gain.setValueAtTime(volume * 0.4, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-      }
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.14);
     }
 
     function step() {
@@ -481,7 +513,6 @@
       const prevBarCount = currentBarCount;
       currentBarCount = Math.floor(currentBeatCount / 4);
 
-      // Section Transition & Key Modulation Tracker
       if (currentBarCount > prevBarCount) {
         const secBar = currentBarCount % barsPerSec;
         if (secBar === 0 && currentBarCount > 0) {
@@ -492,10 +523,6 @@
           const modFreq = document.getElementById('modulation-freq').value;
           if (modFreq === 'section') applyKeyModulation();
         }
-
-        const modFreq = document.getElementById('modulation-freq').value;
-        if (modFreq === '8_bars' && currentBarCount % 8 === 0) applyKeyModulation();
-        if (modFreq === '16_bars' && currentBarCount % 16 === 0) applyKeyModulation();
       }
 
       const profile = getCurrentSectionProfile();
@@ -516,7 +543,7 @@
         currentSectionIdx = 0;
         resetCurrentKey();
         document.getElementById('play-btn').textContent = '⏸ Pause Performance';
-        document.getElementById('play-btn').style.backgroundColor = '#ef4444';
+        document.getElementById('play-btn').style.backgroundColor = 'var(--danger)';
         step();
       } else {
         isPlaying = false;
@@ -526,10 +553,141 @@
       }
     }
 
+    // --- FULL MULTI-TRACK STRUCTURED MIDI EXPORT ENGINE ---
+    function writeVLQ(val) {
+      let buffer = [];
+      let v = Math.max(0, Math.round(val));
+      buffer.push(v & 0x7F);
+      while (v >> 7) {
+        v >>= 7;
+        buffer.unshift((v & 0x7F) | 0x80);
+      }
+      return buffer;
+    }
+
+    function createMetaText(metaType, textStr) {
+      const bytes = Array.from(textStr).map(c => c.charCodeAt(0));
+      return [0x00, 0xFF, metaType, bytes.length, ...bytes];
+    }
+
     function exportStructuredMidi() {
-      logMessage("Exporting structured song arrangement to MIDI file...");
-      // Structured 4-track MIDI Compilation Hook
-      alert("Structured arrangement exported as MIDI file.");
+      const structType = document.getElementById('structure-select').value;
+      const profileList = ARRANGEMENT_PROFILES[structType];
+      const barsPerSection = parseInt(document.getElementById('bars-per-section').value) || 8;
+      const totalBars = profileList.length * barsPerSection;
+
+      const ticksPerQuarter = 96;
+      const targetTotalTicks = totalBars * 4 * ticksPerQuarter;
+      const bpm = parseInt(document.getElementById('tempo-input').value) || 120;
+
+      // Header: Format 1, 5 Tracks (Conductor + Lead + Chords + Bass + Drums)
+      const header = [
+        0x4d, 0x54, 0x68, 0x64, 
+        0x00, 0x00, 0x00, 0x06, 
+        0x00, 0x01, 0x00, 0x05, 
+        (ticksPerQuarter >> 8) & 0xFF, ticksPerQuarter & 0xFF
+      ];
+
+      // Track 0: Conductor / Tempo Track
+      let t0Data = [];
+      const uSec = Math.round(60000000 / bpm);
+      t0Data.push(...createMetaText(0x03, "Tempo Map"));
+      t0Data.push(0x00, 0xFF, 0x51, 0x03, (uSec >> 16) & 0xFF, (uSec >> 8) & 0xFF, uSec & 0xFF);
+      t0Data.push(...writeVLQ(targetTotalTicks), 0xFF, 0x2F, 0x00);
+
+      // Helper function to compile raw event arrays into Standard MIDI tracks
+      const compileTrackBytes = (name, events) => {
+        events.sort((a, b) => a.tick - b.tick);
+        let tData = [...createMetaText(0x03, name)];
+        let lastTick = 0;
+
+        events.forEach(e => {
+          const deltaVLQ = writeVLQ(e.tick - lastTick);
+          if (e.type === 'programChange') {
+            tData.push(...deltaVLQ, 0xC0 | e.channel, e.program & 0x7F);
+          } else if (e.type === 'noteOn') {
+            tData.push(...deltaVLQ, 0x90 | e.channel, e.pitch & 0x7F, e.vel & 0x7F);
+          } else if (e.type === 'noteOff') {
+            tData.push(...deltaVLQ, 0x80 | e.channel, e.pitch & 0x7F, 0x00);
+          } else if (e.type === 'endOfTrack') {
+            tData.push(...deltaVLQ, 0xFF, 0x2F, 0x00);
+          }
+          lastTick = e.tick;
+        });
+
+        const len = tData.length;
+        return [0x4d, 0x54, 0x72, 0x6b, (len >> 24) & 0xFF, (len >> 16) & 0xFF, (len >> 8) & 0xFF, len & 0xFF, ...tData];
+      };
+
+      // Generate Lead Sequence Notes
+      let leadNotes = [];
+      let accumulatedTicks = 0;
+      while (accumulatedTicks < targetTotalTicks) {
+        const note = getNextNoteObject();
+        const noteTicks = Math.round(note.duration * ticksPerQuarter);
+        if (accumulatedTicks + noteTicks > targetTotalTicks) break;
+        leadNotes.push(note);
+        accumulatedTicks += noteTicks;
+      }
+
+      // Track 1: Lead Synthesizer
+      let leadEvents = [{ tick: 0, type: 'programChange', channel: 0, program: 81 }];
+      let timeline = 0;
+      leadNotes.forEach(n => {
+        const durTicks = Math.round(n.duration * ticksPerQuarter);
+        leadEvents.push({ tick: timeline, type: 'noteOn', channel: 0, pitch: n.pitch, vel: n.velocity });
+        leadEvents.push({ tick: timeline + durTicks, type: 'noteOff', channel: 0, pitch: n.pitch });
+        timeline += durTicks;
+      });
+      leadEvents.push({ tick: targetTotalTicks, type: 'endOfTrack' });
+
+      // Track 2: Sustained Pad Chords (Bar Aligned)
+      let chordEvents = [{ tick: 0, type: 'programChange', channel: 1, program: 89 }];
+      const ticksPerMeasure = 4 * ticksPerQuarter;
+      for (let m = 0; m < totalBars; m++) {
+        const barStart = m * ticksPerMeasure;
+        const harmony = getHarmonicHarmony(60 + (m % 12));
+        harmony.triad.forEach(p => {
+          chordEvents.push({ tick: barStart, type: 'noteOn', channel: 1, pitch: p, vel: 80 });
+          chordEvents.push({ tick: barStart + ticksPerMeasure, type: 'noteOff', channel: 1, pitch: p });
+        });
+      }
+      chordEvents.push({ tick: targetTotalTicks, type: 'endOfTrack' });
+
+      // Track 3: Sub-Bass Anchor
+      let bassEvents = [{ tick: 0, type: 'programChange', channel: 2, program: 33 }];
+      for (let m = 0; m < totalBars; m++) {
+        const barStart = m * ticksPerMeasure;
+        const harmony = getHarmonicHarmony(60 + (m % 12));
+        bassEvents.push({ tick: barStart, type: 'noteOn', channel: 2, pitch: harmony.bass, vel: 90 });
+        bassEvents.push({ tick: barStart + ticksPerMeasure, type: 'noteOff', channel: 2, pitch: harmony.bass });
+      }
+      bassEvents.push({ tick: targetTotalTicks, type: 'endOfTrack' });
+
+      // Track 4: Drum Percussion (GM Channel 10 -> Hex 9)
+      let drumEvents = [];
+      for (let m = 0; m < totalBars; m++) {
+        const barStart = m * ticksPerMeasure;
+        drumEvents.push({ tick: barStart, type: 'noteOn', channel: 9, pitch: 36, vel: 110 });
+        drumEvents.push({ tick: barStart + 12, type: 'noteOff', channel: 9, pitch: 36 });
+        drumEvents.push({ tick: barStart + (2 * ticksPerQuarter), type: 'noteOn', channel: 9, pitch: 38, vel: 115 });
+        drumEvents.push({ tick: barStart + (2 * ticksPerQuarter) + 12, type: 'noteOff', channel: 9, pitch: 38 });
+      }
+      drumEvents.push({ tick: targetTotalTicks, type: 'endOfTrack' });
+
+      const track0 = [0x4d, 0x54, 0x72, 0x6b, (t0Data.length >> 24) & 0xFF, (t0Data.length >> 16) & 0xFF, (t0Data.length >> 8) & 0xFF, t0Data.length & 0xFF, ...t0Data];
+      const track1 = compileTrackBytes("Lead Melody", leadEvents);
+      const track2 = compileTrackBytes("Sustained Chords", chordEvents);
+      const track3 = compileTrackBytes("Sub-Bass Anchor", bassEvents);
+      const track4 = compileTrackBytes("Percussion Drums", drumEvents);
+
+      const blob = new Blob([new Uint8Array([...header, ...track0, ...track1, ...track2, ...track3, ...track4])], { type: 'audio/midi' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `markov_arranged_${totalBars}bars_song.mid`;
+      a.click();
+
+      logMessage(`Exported Structured MIDI file (${totalBars} Bars) successfully!`);
     }
 
     resetCurrentKey();
